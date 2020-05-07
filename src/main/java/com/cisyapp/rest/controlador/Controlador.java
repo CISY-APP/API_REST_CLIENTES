@@ -46,15 +46,20 @@ public class Controlador {
 	
 	 //Método utilizado para realizar el login de usuario
 		//Metodo que recibe un String con el email a consultar desde la ruta de la petición y devuelve la entidad que coincide
-		 @RequestMapping(value = "/loginUser/{email}", method = RequestMethod.GET)//Asociamos la petición recibida la metodo de respuesta
-			public ResponseEntity<Usuario> consultarUsuario(@PathVariable("email") String email) {
+		 @RequestMapping(value = "/loginUser/{email}/{clave}", method = RequestMethod.GET)//Asociamos la petición recibida la metodo de respuesta
+			public ResponseEntity<Usuario> consultarUsuario(@PathVariable("email") String email, @PathVariable("clave") String clave) {
 		    	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuario(email);//Llamamos al metodo consultarUsuario del servicio
 		    	if (uOpt.isPresent()) {
-		    		Usuario u= uOpt.get();
-		    		return new ResponseEntity<Usuario>(u,HttpStatus.OK);//Si existe devolvemos el usuario solicitado
-		    	}
-		    	else
+		    		if (uOpt.get().getClave().equals(clave)){
+		    			Usuario u= uOpt.get();
+			    		return new ResponseEntity<Usuario>(u,HttpStatus.OK);//Si existe devolvemos el usuario solicitado
+		    		}else {
+		    			return null;
+		    		}
+		    	}else {
 		    		return null;
+		    	}
+		    		
 			}
 	
 	
