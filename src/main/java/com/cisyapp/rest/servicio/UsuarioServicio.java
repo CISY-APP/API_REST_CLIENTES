@@ -16,8 +16,8 @@ public class UsuarioServicio{
 	private UsuarioRepositorio UsuarioRepositorio;
 
 	
-	// Metodo utilizado para registrar un nuevo cliente.
-	public Usuario registrarUsuario(Usuario usuario) {
+	// Metodo utilizado para registrar un nuevo usuario.
+	public Usuario registraUsuario(Usuario usuario) {
 		return UsuarioRepositorio.save(usuario);
 	}
 
@@ -26,7 +26,16 @@ public class UsuarioServicio{
 	}*/
 
 	//Metodo para consultar filtrando por email
-		public Optional<Usuario> consultaUsuario(String email){
-			return UsuarioRepositorio.findByemail(email);
+		public Optional<Usuario> consultaUsuarioPorEmail(String email){
+			return UsuarioRepositorio.findByEmail(email);
+		}
+		
+	//Metodo para consultar filtrando por id
+		public Optional<Usuario> consultaUsuarioPorId(Integer id){
+			return UsuarioRepositorio.findById(id);
+		}
+		
+		public Usuario actualizaUsuario(Usuario u) {
+			return UsuarioRepositorio.save(u);
 		}
 }

@@ -15,7 +15,7 @@ public class ViajeServicio {
 	private ViajeRepositorio ViajeRepositorio;
 	
 	// Metodo utilizado para registrar un nuevo viaje en la cuenta de un usuario.
-	public Viaje registrarViaje(Viaje viaje) {
+	public Viaje registraViaje(Viaje viaje) {
 		return ViajeRepositorio.save(viaje);
 	}
 

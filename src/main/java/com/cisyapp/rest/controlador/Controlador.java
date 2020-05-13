@@ -1,8 +1,12 @@
 package com.cisyapp.rest.controlador;
 
 
+import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.cisyapp.rest.modelo.Usuario;
+import com.cisyapp.rest.modelo.Vehiculo;
 import com.cisyapp.rest.modelo.Viaje;
+import com.cisyapp.rest.servicio.IncidenciaServicio;
 import com.cisyapp.rest.servicio.UsuarioServicio;
+import com.cisyapp.rest.servicio.VehiculoServicio;
 import com.cisyapp.rest.servicio.ViajeServicio;
 
 
@@ -29,69 +36,159 @@ public class Controlador {
 
 	@Autowired
 	private ViajeServicio ViajeServicio;
+	
+	@Autowired
+	private IncidenciaServicio IncidenciaServicio;
+	
+	@Autowired
+	private VehiculoServicio VehiculoServicio;
 
 	
 	// ------------------------------USUARIOS------------------------------
-	/* Método utilizado para registrar un cliente en la aplicación.
-	 * Se realizara unicamente con los campos obligatorios.
-	 * - Nombre
-	 * - Apellidos
-	 * - Email
-	 * - Contraseña
-	 */
+	
+	
+	//REGISTRO USUARIOS
+	
 	@RequestMapping(value = "/registrarUsuario", method = RequestMethod.POST)
-	public ResponseEntity<Usuario> registrarUsuario(@RequestBody Usuario usuario) {
-		return new ResponseEntity<Usuario>(UsuarioServicio.registrarUsuario(usuario), HttpStatus.OK);
+	public ResponseEntity<Usuario> registraUsuario(@Valid @RequestBody Usuario usuario) {
+		return new ResponseEntity<Usuario>(UsuarioServicio.registraUsuario(usuario), HttpStatus.OK);
 	}
 	
-	 //Método utilizado para realizar el login de usuario
-		//Metodo que recibe un String con el email a consultar desde la ruta de la petición y devuelve la entidad que coincide
-		 @RequestMapping(value = "/loginUser/{email}/{clave}", method = RequestMethod.GET)//Asociamos la petición recibida la metodo de respuesta
-			public ResponseEntity<Usuario> consultarUsuario(@PathVariable("email") String email, @PathVariable("clave") String clave) {
-		    	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuario(email);//Llamamos al metodo consultarUsuario del servicio
-		    	if (uOpt.isPresent()) {
-		    		if (uOpt.get().getClave().equals(clave)){
-		    			Usuario u= uOpt.get();
-			    		return new ResponseEntity<Usuario>(u,HttpStatus.OK);//Si existe devolvemos el usuario solicitado
-		    		}else {
-		    			return null;
-		    		}
+	
+	 //LOGIN DE USUARIO
+	//Metodo que recibe un String con el email a consultar y la clave del usuario desde la ruta de la petición y devuelve la entidad que coincide
+	@RequestMapping(value = "/loginUser/{email}/{clave}", method = RequestMethod.GET)//Asociamos la petición recibida la metodo de respuesta
+	public ResponseEntity<Usuario> consultaUsuarioPorEmail(@PathVariable("email") String email, @PathVariable("clave") String clave) {
+		Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorEmail(email);//Llamamos al metodo consultaUsuario del servicio
+			if (uOpt.isPresent()) {//Si existe el usuario, comprobamos si la clave es correcta
+				if (uOpt.get().getClave().equals(clave)){
+					Usuario u= uOpt.get();
+			    	return new ResponseEntity<Usuario>(u,HttpStatus.OK);//Si existe el usuario y la clave es correcta devolvemos el usuario
 		    	}else {
-		    		return null;
-		    	}
+		    		return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);
+		    		}
+		    }else {
+		    		return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+		    }
 		    		
-			}
+	}
 	
-	
+ 
 	
 	// ------------------------------VIAJES------------------------------
-	/* Metodo utilizado para registrar un viaje 
-	 * Campos necesario para poder registrar un viaje
-	 * - IDUsuario que publica el viaje.
-	 * - IDVehiculo que realiza el viaje
-	 * - Numero plazas disponibles
-	 * - Origen
-	 * - Destino 
-	 * - Hora de salida
-	 * - Precio (El sistema recomendará un precio en función del origen y el destino por plaza) 
-	 * - Fecha de creacion del viaje (la coje del sistema)
-	 */
+		 
+		 
+		 
+		 
+	//REGISTRAR VIAJE
 	@RequestMapping(value = "/registrarViaje", method = RequestMethod.POST)
-	public ResponseEntity<Viaje> registrarViaje(@RequestBody Viaje viaje) {
-		return new ResponseEntity<Viaje>(ViajeServicio.registrarViaje(viaje), HttpStatus.OK);
+	public ResponseEntity<Viaje> registraViaje(@RequestBody Map<String, String> param) {
+ 		Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
+ 		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+ 		if(uOpt.isPresent()) {
+ 			if(uOpt.get().getEsconductor()==true) {
+ 				String auxMatricula=param.get("matricula");
+ 				Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(auxMatricula);
+ 				if(vOpt.get().getUsuario().getIdusuario()==auxIdUsuario) {
+ 					String auxOrigen=param.get("origen");
+ 	 				String auxDestino=param.get("destino");
+ 	 				int auxNumPlazas=Integer.parseInt(param.get("numPlazas"));
+ 	 				Date auxFecha=Date.valueOf(param.get("fecha"));
+ 	 				Viaje v=new Viaje(uOpt.get(), vOpt.get(), auxOrigen, auxDestino, auxNumPlazas, auxFecha);
+ 	 				return new ResponseEntity<Viaje>(ViajeServicio.registraViaje(v), HttpStatus.OK);
+ 				}else {
+ 					return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+ 				}
+ 				
+			}else {
+				return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);
+			}
+ 		}else {
+ 			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
+ 		}
 	}
 	
-   /* Metodo para consultar los viajes disponibles, este mnétodo se utiliza para mostrar los viajes al usuario que quiere realizar una reserva
-    * en uno de los coches
-	* Campos necesarios por los cuales se realiza la busqueda.
-	* - Origen
-	* - Destino
-	* - Fecha (Dia/mes/año)
-	* - Hora
-   */
+	
+	
+	//CONSULTAR VIAJE FILTRANDO
  	@RequestMapping(value="/consultaViajesReservar/{origen}/{destino}/{fecha}/{hora}", method=RequestMethod.GET)
 	public ResponseEntity<List<Viaje>> consultaViajesReservar(@PathVariable("origen") String origen, @PathVariable("destino") String destino, @PathVariable("fecha") String fecha, @PathVariable("hora") String hora){
 		return new ResponseEntity<List<Viaje>>(ViajeServicio.consultaViajesReservar(origen, destino, fecha, hora),HttpStatus.OK);		
 	}
 	
+ 	
+ 	
+ 	
+ // ------------------------------INCIDENCIAS------------------------------
+ 	
+ 	
+ 	
+ 	
+ // ------------------------------VEHICULOS------------------------------
+ 	
+ 	
+ 	//REGISTRAR VEHICULO
+ 	@RequestMapping(value = "/registrarVehiculo", method = RequestMethod.POST)
+	public ResponseEntity<Vehiculo> registraVehiculo(@RequestBody Map<String, String> param) {
+ 		Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
+ 		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+ 		if(uOpt.isPresent()) {
+ 			String matricula=param.get("matricula");
+ 			Date fecha=Date.valueOf(param.get("fecha_alta"));
+ 			Vehiculo v=new Vehiculo(uOpt.get(),matricula, fecha);
+ 			Usuario u=uOpt.get();
+ 			u.setEsconductor(true);
+			UsuarioServicio.actualizaUsuario(u);
+ 			
+ 			return new ResponseEntity<Vehiculo>(VehiculoServicio.registraVehiculo(v), HttpStatus.OK);
+ 		}else {
+ 			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
+ 		}
+	}
+ 	
+ 	
+ 	
+ 	
+ 	//MOSTRAR VEHICULOS POR ID DE USUARIO
+ 	@RequestMapping(value = "/consultarVehiculoPorIdUsuario/{id}", method = RequestMethod.GET)
+	public ResponseEntity<List<Vehiculo>> consultaVehiculoPorIdUsuario(@PathVariable("id") Integer id) {
+ 		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(id);
+ 		if(uOpt.isPresent()) {
+ 			return new ResponseEntity<List<Vehiculo>>(VehiculoServicio.consultaVehiculosPorIdUsuario(id), HttpStatus.OK);
+ 		}else {
+ 			return new ResponseEntity<List<Vehiculo>>(HttpStatus.NOT_FOUND);
+ 		}	
+	}
+ 	
+ 	
+ 	
+ 	
+ 	//DAR DE BAJA VEHICULO
+ 	//Metodo que recibe un Integer con el Id a del Producto a eliminar desde la ruta de la petición y lo elimina si existe
+ 		@RequestMapping(value = "/eliminarVehiculo/{id}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta
+ 		public ResponseEntity<Vehiculo> eliminarVehiculoPorId(@PathVariable("id") Integer id) {
+ 		    Optional<Vehiculo> vOpt=VehiculoServicio.consultaVehiculoPorId(id);
+ 		    if (vOpt.isPresent()) {
+ 		    	Vehiculo v= vOpt.get();
+ 		    	Integer auxIdUsuario=v.getUsuario().getIdusuario();
+ 		    	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+ 		    	Usuario u=uOpt.get();
+ 		    	VehiculoServicio.eliminaVehiculo(v);//Si el vehiculo existe, llamamos al metodo eliminar del servicio
+ 		    	Integer numVehiculos=VehiculoServicio.cuentaVehiculoPorIdUsuario(auxIdUsuario);
+ 		    	if(numVehiculos==0) {
+ 		    		u.setEsconductor(false);
+ 		    		UsuarioServicio.actualizaUsuario(u);
+ 		    	}
+ 		    	
+ 		    	return new ResponseEntity<>(null,HttpStatus.OK);//Si existe eliminamos el vehiculo solicitado
+ 		    }
+ 		    else {
+ 		    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+ 		    }
+ 		 }
+
+
+ 
+ 	
+ 	
 }
