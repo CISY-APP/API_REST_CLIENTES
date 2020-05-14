@@ -73,6 +73,89 @@ public class Controlador {
 		    		
 	}
 	
+	
+	//MOSTRAR USUARIO POR ID
+	 	@RequestMapping(value = "/consultarUsuarioPorId/{id}", method = RequestMethod.GET)
+		public ResponseEntity<Usuario> consultaUsuarioPorId(@PathVariable("id") Integer id) {
+	 		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(id);
+	 		if(uOpt.isPresent()) {
+	 			Usuario u=uOpt.get();
+	 			return new ResponseEntity<Usuario>(u, HttpStatus.OK);
+	 		}else {
+	 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+	 		}	
+		}
+	
+	
+	//ACTUALIZAR USUARIO
+	 @RequestMapping(value = "/actualizarUsuario", method = RequestMethod.PUT)//Asociamos la petición recibida la metodo de respuesta
+	   	public ResponseEntity<Usuario> actualizaUsuarioPorID(@RequestBody Map<String, String> param) {
+		 
+		 	Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
+		 	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+	    	
+		 	if(uOpt.isPresent()) {
+		 		Usuario u=uOpt.get();
+		 		
+		 		if(!param.get("telefono").equals("")) {
+		 			u.setTelefono(Integer.parseInt(param.get("telefono")));
+		 		}
+		 		if(!param.get("fechaNac").equals("")) {
+		 			u.setFechanacimiento(Date.valueOf(param.get("fechaNac")));
+		 		}
+		 		if(!param.get("descripcion").equals("")) {
+		 			u.setDescripcion(param.get("descripcion"));
+		 		}
+		 		
+		 		return ResponseEntity.ok(UsuarioServicio.actualizaUsuario(u));
+		 	}else {
+		 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		 	}
+	    
+	    		
+	   	}
+	 
+	 
+	 //ACTUALIZAR CLAVE DE USUARIO POR ID USUARIO
+	 @RequestMapping(value = "/actualizarClaveUsuario", method = RequestMethod.PUT)//Asociamos la petición recibida la metodo de respuesta
+	   	public ResponseEntity<Usuario> actualizaClaveUsuario(@RequestBody Map<String, String> param) {
+		 
+		 	Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
+		 	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+	    	
+		 	if(uOpt.isPresent()) {
+		 		Usuario u=uOpt.get();
+		 		
+		 		String auxClaveActual=param.get("claveActual");
+		 		if(u.getClass().equals(auxClaveActual)) {
+		 			u.setClave(param.get("nuevaClave"));
+		 			return ResponseEntity.ok(UsuarioServicio.actualizaUsuario(u));
+		 		}else {
+		 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		 		}
+		 		
+		 	}else {
+		 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		 	}
+	    
+	    		
+	   	}
+	 
+	 
+	 //ELIMINAR USUARIO POR ID
+	 @RequestMapping(value = "/eliminarUsuario/{id}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta
+		public ResponseEntity<Usuario> eliminarUsuarioPorId(@PathVariable("id") Integer id) {
+		    Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(id);
+		    if (uOpt.isPresent()) {
+		    	Usuario u= uOpt.get();
+		    	return new ResponseEntity<>(UsuarioServicio.eliminaUsuario(u),HttpStatus.OK);//Si existe eliminamos el vehiculo solicitado
+		    }else {	
+		    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+		    }
+		   
+		}
+
+	
  
 	
 	// ------------------------------VIAJES------------------------------
@@ -161,9 +244,22 @@ public class Controlador {
 	}
  	
  	
+ 	//MOSTRAR VEHICULO POR MATRICULA
+ 	 	@RequestMapping(value = "/consultarVehiculoPorIdUsuario/{matricula}", method = RequestMethod.GET)
+ 		public ResponseEntity<Vehiculo>consultaVehiculoPorMatricula(@PathVariable("matricula") String matricula) {
+ 	 		Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(matricula);
+ 	 		if(vOpt.isPresent()) {
+ 	 			Vehiculo v=vOpt.get();
+ 	 			return new ResponseEntity<Vehiculo>(v, HttpStatus.OK);
+ 	 		}else {
+ 	 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+ 	 		}	
+ 		}
  	
  	
- 	//DAR DE BAJA VEHICULO
+ 	
+ 	
+ 	//ELIMINAR VEHICULO POR ID
  	//Metodo que recibe un Integer con el Id a del Producto a eliminar desde la ruta de la petición y lo elimina si existe
  		@RequestMapping(value = "/eliminarVehiculo/{id}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta
  		public ResponseEntity<Vehiculo> eliminarVehiculoPorId(@PathVariable("id") Integer id) {

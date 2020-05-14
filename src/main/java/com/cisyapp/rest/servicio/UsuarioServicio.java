@@ -38,4 +38,10 @@ public class UsuarioServicio{
 		public Usuario actualizaUsuario(Usuario u) {
 			return UsuarioRepositorio.save(u);
 		}
+		
+		public Usuario eliminaUsuario(Usuario u) {
+			UsuarioRepositorio.delete(u);
+			return null;
+		}
+		
 }
