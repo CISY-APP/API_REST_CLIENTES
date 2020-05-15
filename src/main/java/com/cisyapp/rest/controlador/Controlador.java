@@ -160,6 +160,26 @@ public class Controlador {
 	
 	// ------------------------------VIAJES------------------------------
 		 
+	 
+	// REGISTRO VIAJES OBJETOS
+		@RequestMapping(value = "/registrarViaje", method = RequestMethod.POST)
+		public ResponseEntity<Viaje> registraViaje(@Valid @RequestBody Viaje viaje) {
+			Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(viaje.getUsuario().getIdusuario());
+			if(uOpt.isPresent()){
+				if(uOpt.get().getEsconductor()==true) {
+					Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(viaje.getVehiculo().getMatricula());
+					if(vOpt.isPresent()) {
+						return new ResponseEntity<Viaje>(ViajeServicio.registraViaje(viaje), HttpStatus.OK);
+					} else {
+						return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+					}
+				} else {
+					return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+				}
+			} else {
+				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			}
+		}
 		 
 		 
 		 
@@ -245,7 +265,7 @@ public class Controlador {
  	
  	
  	//MOSTRAR VEHICULO POR MATRICULA
- 	 	@RequestMapping(value = "/consultarVehiculoPorIdUsuario/{matricula}", method = RequestMethod.GET)
+ 	 	@RequestMapping(value = "/consultarVehiculoPorMatricula/{matricula}", method = RequestMethod.GET)
  		public ResponseEntity<Vehiculo>consultaVehiculoPorMatricula(@PathVariable("matricula") String matricula) {
  	 		Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(matricula);
  	 		if(vOpt.isPresent()) {
