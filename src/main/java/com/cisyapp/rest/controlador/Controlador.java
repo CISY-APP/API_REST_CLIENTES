@@ -1,6 +1,7 @@
 package com.cisyapp.rest.controlador;
 
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,6 @@ public class Controlador {
 	
 	
 	//REGISTRO USUARIOS
-	
 	@RequestMapping(value = "/registrarUsuario", method = RequestMethod.POST)
 	public ResponseEntity<Usuario> registraUsuario(@Valid @RequestBody Usuario usuario) {
 		return new ResponseEntity<Usuario>(UsuarioServicio.registraUsuario(usuario), HttpStatus.OK);
@@ -160,7 +160,7 @@ public class Controlador {
 	
 	// ------------------------------VIAJES------------------------------
 		 
-	 
+	/* 
 	// REGISTRO VIAJES OBJETOS
 		@RequestMapping(value = "/registrarViaje", method = RequestMethod.POST)
 		public ResponseEntity<Viaje> registraViaje(@Valid @RequestBody Viaje viaje) {
@@ -181,7 +181,7 @@ public class Controlador {
 			}
 		}
 		 
-		 
+		 */
 		 
 	//REGISTRAR VIAJE
 	@RequestMapping(value = "/registrarViaje", method = RequestMethod.POST)
@@ -197,6 +197,9 @@ public class Controlador {
  	 				String auxDestino=param.get("destino");
  	 				int auxNumPlazas=Integer.parseInt(param.get("numPlazas"));
  	 				Date auxFecha=Date.valueOf(param.get("fecha"));
+ 	 				Date auxHora=Date.valueOf(param.get("horaSalida"));
+ 	 				Long precioAux=Long.valueOf(param.get("precio"));
+ 	 				BigDecimal auxPrecio=BigDecimal.valueOf(precioAux);
  	 				Viaje v=new Viaje(uOpt.get(), vOpt.get(), auxOrigen, auxDestino, auxNumPlazas, auxFecha);
  	 				return new ResponseEntity<Viaje>(ViajeServicio.registraViaje(v), HttpStatus.OK);
  				}else {
