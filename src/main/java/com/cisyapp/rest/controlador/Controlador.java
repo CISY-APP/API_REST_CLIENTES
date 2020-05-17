@@ -48,14 +48,15 @@ public class Controlador {
 	// ------------------------------USUARIOS------------------------------
 	
 	
-	//REGISTRO USUARIOS
+	//REGISTRO USUARIOS 
+	//(Añadir metodo para comprobar la clave)
 	@RequestMapping(value = "/registrarUsuario", method = RequestMethod.POST)
 	public ResponseEntity<Usuario> registraUsuario(@Valid @RequestBody Usuario usuario) {
 		return new ResponseEntity<Usuario>(UsuarioServicio.registraUsuario(usuario), HttpStatus.OK);
 	}
 	
 	
-	 //LOGIN DE USUARIO
+	//LOGIN DE USUARIO
 	//Metodo que recibe un String con el email a consultar y la clave del usuario desde la ruta de la petición y devuelve la entidad que coincide
 	@RequestMapping(value = "/loginUser/{email}/{clave}", method = RequestMethod.GET)//Asociamos la petición recibida la metodo de respuesta
 	public ResponseEntity<Usuario> consultaUsuarioPorEmail(@PathVariable("email") String email, @PathVariable("clave") String clave) {
@@ -75,9 +76,9 @@ public class Controlador {
 	
 	
 	//MOSTRAR USUARIO POR ID
-	 	@RequestMapping(value = "/consultarUsuarioPorId/{id}", method = RequestMethod.GET)
-		public ResponseEntity<Usuario> consultaUsuarioPorId(@PathVariable("id") Integer id) {
-	 		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(id);
+	@RequestMapping(value = "/consultarUsuarioPorId/{id}", method = RequestMethod.GET)
+	public ResponseEntity<Usuario> consultaUsuarioPorId(@PathVariable("id") Integer id) {
+	 	Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(id);
 	 		if(uOpt.isPresent()) {
 	 			Usuario u=uOpt.get();
 	 			return new ResponseEntity<Usuario>(u, HttpStatus.OK);
@@ -98,8 +99,18 @@ public class Controlador {
 		 		Usuario u=uOpt.get();
 		 		
 		 		if(!param.get("telefono").equals("")) {
-		 			u.setTelefono(Integer.parseInt(param.get("telefono")));
+		 			try {
+		 				Integer auxTelefono=Integer.parseInt(param.get("telefono"));
+		 				if(param.get("telefono").length()==9) {
+		 					u.setTelefono(auxTelefono);
+		 				}else {
+		 					return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		 				}
+		 			}catch(NumberFormatException n){
+		 				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+		 			}
 		 		}
+		 		
 		 		if(!param.get("fechaNac").equals("")) {
 		 			u.setFechanacimiento(Date.valueOf(param.get("fechaNac")));
 		 		}
