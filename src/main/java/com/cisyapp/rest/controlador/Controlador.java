@@ -67,7 +67,7 @@ public class Controlador {
 			    	return new ResponseEntity<Usuario>(u,HttpStatus.OK);//Si existe el usuario y la clave es correcta devolvemos el usuario
 		    	}else {
 		    		return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);
-		    		}
+		    	}
 		    }else {
 		    		return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
 		    }
@@ -138,7 +138,7 @@ public class Controlador {
 		 		Usuario u=uOpt.get();
 		 		
 		 		String auxClaveActual=param.get("claveActual");
-		 		if(u.getClass().equals(auxClaveActual)) {
+		 		if(u.getClave().equals(auxClaveActual)) {
 		 			u.setClave(param.get("nuevaClave"));
 		 			return ResponseEntity.ok(UsuarioServicio.actualizaUsuario(u));
 		 		}else {
