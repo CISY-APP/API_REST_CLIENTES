@@ -139,7 +139,7 @@ public class Controlador {
 		 		if(!param.get("fechaNac").equals("")) {									//Comprobamos que el atributo fecha Nacimiento tiene contenido
 		 			u.setFechanacimiento(Date.valueOf(param.get("fechaNac")));			//si tiene contenido establecemos la nueva fecha
 		 		}
-		 		if(!param.get("descripcion").equals("")) {								//Comprobamos que el altributo descripción tiene contenido
+		 		if(!param.get("descripcion").equals("") && !(param.get("descripcion").length()>300)) {								//Comprobamos que el altributo descripción tiene contenido
 		 			u.setDescripcion(param.get("descripcion"));							//si tiene contenido establecemos la nueva descripción
 		 		}
 		 		
