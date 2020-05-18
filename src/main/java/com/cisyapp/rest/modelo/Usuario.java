@@ -18,6 +18,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -34,18 +35,22 @@ import javax.validation.constraints.Size;
 public class Usuario implements java.io.Serializable {
 
 	private Integer idusuario;
+	@NotNull	
 	@Size(min=1, max=20)
 	@Pattern(regexp = "[a-z A-Z]+", message="El nombre solo puede estar formado por letras")
 	private String nombre;
+	@NotNull
 	@Size(min=1, max=20)
 	@Pattern(regexp = "[a-z A-Z]+", message="Los apellidos solo pueden estar formados por letras")
 	private String apellidos;
 	private Boolean espasajero;
 	private Boolean esconductor;
 	private Integer telefono;
+	@NotNull
 	@Size(max=30)
 	@Email(message="Introduzca un formato de correo válido")
 	private String email;
+	@NotNull
 	@Size(min=6, max=30)
 	@Pattern(regexp = "[a-zA-Z0-9]+", message="la clave no admite caracteres especiales")
 	private String clave;
