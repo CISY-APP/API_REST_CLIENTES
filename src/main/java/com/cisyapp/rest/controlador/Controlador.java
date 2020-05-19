@@ -293,14 +293,38 @@ public class Controlador {
  	
  	
  	//REGISTRAR VEHICULO
+ 	//MATRICULA, MARCA, MODELO, COMBUSTIBLE Y COLOR
  	@RequestMapping(value = "/registrarVehiculo", method = RequestMethod.POST)
-	public ResponseEntity<Vehiculo> registraVehiculo(@RequestBody Map<String, String> param) {
+	public ResponseEntity<Vehiculo> registraVehiculo(@Valid @RequestBody Map<String, String> param) {
  		Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
  		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
  		if(uOpt.isPresent()) {
- 			String matricula=param.get("matricula");
- 			Date fecha=Date.valueOf(param.get("fecha_alta"));
- 			Vehiculo v=new Vehiculo(uOpt.get(),matricula, fecha);
+ 			String auxMatricula=param.get("matricula");
+ 			auxMatricula=auxMatricula.replaceAll("\\s","").toUpperCase();
+ 			if(auxMatricula.length()==7) {
+ 				try {
+ 					Integer.parseInt(auxMatricula.substring(0, 4));
+ 					boolean pruebaLetras=true;
+ 					for(int i = 0 ; i < auxMatricula.substring(4).length() && pruebaLetras ; i++ ) {
+ 						if(auxMatricula.charAt(i)<'A'||auxMatricula.charAt(i)<'Z') {
+ 							pruebaLetras=false;
+ 							return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+ 						}
+ 					}
+ 				}catch (NumberFormatException n){
+ 					return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+ 				}
+ 			}else {
+ 				return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);	
+ 			}
+ 			
+ 			Vehiculo v=new Vehiculo();
+ 			v.setUsuario(uOpt.get());
+ 			v.setMatricula(auxMatricula);
+ 			v.setMarca(param.get("marca"));
+ 			v.setModelo(param.get("modelo"));
+ 			v.setCombustible(param.get("combustible"));
+ 			v.setColor(param.get("color"));
  			Usuario u=uOpt.get();
  			u.setEsconductor(true);
 			UsuarioServicio.actualizaUsuario(u);
@@ -327,16 +351,43 @@ public class Controlador {
  	
  	
  	//MOSTRAR VEHICULO POR MATRICULA
- 	 	@RequestMapping(value = "/consultarVehiculoPorMatricula/{matricula}", method = RequestMethod.GET)
- 		public ResponseEntity<Vehiculo>consultaVehiculoPorMatricula(@PathVariable("matricula") String matricula) {
- 	 		Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(matricula);
+ 	@RequestMapping(value = "/consultarVehiculoPorMatricula/{matricula}", method = RequestMethod.GET)
+ 	public ResponseEntity<Vehiculo>consultaVehiculoPorMatricula(@PathVariable("matricula") String matricula) {
+ 	 	Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(matricula);
+ 	 	if(vOpt.isPresent()) {
+ 	 		Vehiculo v=vOpt.get();
+ 	 		return new ResponseEntity<Vehiculo>(v, HttpStatus.OK);
+ 	 	}else {
+ 	 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+ 	 	}	
+ 	}
+ 	
+ 	
+ 	//ACTUALIZAR VEHICULO
+ 	@RequestMapping(value = "/actualizarVehiculo", method = RequestMethod.PUT)
+	public ResponseEntity<Vehiculo> actualizaVehiculo(@Valid @RequestBody Map<String, String> param) {
+ 		try {
+ 			Integer auxIdVehiculo=Integer.parseInt(param.get("id"));
+ 			Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorId(auxIdVehiculo);
  	 		if(vOpt.isPresent()) {
+ 	 			vOpt.get().setMarca(param.get("marca"));
+ 	 			vOpt.get().setMarca(param.get("modelo"));
+ 	 			vOpt.get().setMarca(param.get("combustible"));
+ 	 			vOpt.get().setMarca(param.get("color"));
  	 			Vehiculo v=vOpt.get();
- 	 			return new ResponseEntity<Vehiculo>(v, HttpStatus.OK);
+ 	 			return ResponseEntity.ok(VehiculoServicio.actualizaVehiculo(v));
  	 		}else {
  	 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
- 	 		}	
+ 	 		}
+ 	 		
+ 		}catch(NumberFormatException n) {
+ 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
  		}
+ 		
+ 		
+ 			
+ 		
+ 	}
  	
  	
  	

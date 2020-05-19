@@ -1,6 +1,5 @@
 package com.cisyapp.rest.servicio;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +42,10 @@ public class VehiculoServicio{
 		return VehiculoRepositorio.findBymatricula(matricula);
 		}
 	
+	//Metodo para actualizar los datos del vehiculo
+	public Vehiculo actualizaVehiculo(Vehiculo v) {
+		return VehiculoRepositorio.save(v);
+	}
 		
 	//Metodo para eliminar Vehiculo
 	public Vehiculo eliminaVehiculo(Vehiculo v) {
