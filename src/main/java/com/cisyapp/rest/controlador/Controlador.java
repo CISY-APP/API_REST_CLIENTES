@@ -305,8 +305,8 @@ public class Controlador {
  				try {
  					Integer.parseInt(auxMatricula.substring(0, 4));
  					boolean pruebaLetras=true;
- 					for(int i = 0 ; i < auxMatricula.substring(4).length() && pruebaLetras ; i++ ) {
- 						if(auxMatricula.charAt(i)<'A'||auxMatricula.charAt(i)<'Z') {
+ 					for(int i = 4 ; i < auxMatricula.length() && pruebaLetras ; i++ ) {
+ 						if(auxMatricula.charAt(i)<'A'||auxMatricula.charAt(i)>'Z') {
  							pruebaLetras=false;
  							return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
  						}
