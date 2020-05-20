@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.cisyapp.rest.modelo.Usuario;
+import com.cisyapp.rest.modelo.UsuarioConIgnore;
 import com.cisyapp.rest.modelo.Vehiculo;
 import com.cisyapp.rest.modelo.Viaje;
 import com.cisyapp.rest.servicio.IncidenciaServicio;
@@ -46,7 +47,6 @@ public class Controlador {
 
 	
 	// ------------------------------USUARIOS------------------------------
-	
 	
 	//REGISTRO USUARIOS 
 	@RequestMapping(value = "/registrarUsuario", method = RequestMethod.POST) //Definimos la URI a la que nos deben enviar las peticiones y el metodo http
@@ -77,146 +77,163 @@ public class Controlador {
 		
 	}
 	
-	
 	//LOGIN DE USUARIO
 	//Metodo que recibe un String con el email a consultar y la clave del usuario desde la ruta de la petición y devuelve la entidad que coincide
 	@RequestMapping(value = "/loginUser/{email}/{clave}", method = RequestMethod.GET)//Asociamos la petición recibida la metodo de respuesta
-	public ResponseEntity<Usuario> consultaUsuarioPorEmail(@PathVariable("email") String email, @PathVariable("clave") String clave) {
+	public ResponseEntity<UsuarioConIgnore> consultaUsuarioPorEmail(@PathVariable("email") String email, @PathVariable("clave") String clave) {
 		Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorEmail(email);//Llamamos al metodo consultaUsuario del servicio
-			if (uOpt.isPresent()) {//Si existe el usuario, comprobamos si la clave es correcta
-				if (uOpt.get().getClave().equals(clave)){
-					Usuario u= uOpt.get();
-			    	return new ResponseEntity<Usuario>(u,HttpStatus.OK);//Si existe el usuario y la clave es correcta devolvemos el usuario
-		    	}else {
-		    		return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);
-		    	}
-		    }else {
-		    		return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
-		    }
-		    		
+		if (uOpt.isPresent()) {//Si existe el usuario, comprobamos si la clave es correcta
+			if (uOpt.get().getClave().equals(clave)){
+				Usuario u= uOpt.get();
+				//Creamos un usuario con jsonignore
+				UsuarioConIgnore uI = new UsuarioConIgnore();
+				uI.setApellidos(u.getApellidos());uI.setClave(u.getClave());uI.setDescripcion(u.getDescripcion());
+				uI.setDoblefactoractivado(u.getDoblefactoractivado());uI.setEmail(u.getEmail());uI.setEmailverificado(u.getEmailverificado());
+				uI.setEsconductor(u.getEsconductor());uI.setEspasajero(u.getEspasajero());uI.setFechadesconexion(u.getFechadesconexion());
+				uI.setFechanacimiento(u.getFechanacimiento());uI.setFecharegistro(u.getFecharegistro());uI.setFotokyc(u.getFotokyc());
+				uI.setFotousuario(u.getFotousuario());uI.setIdusuario(u.getIdusuario());uI.setIncidencias(u.getIncidencias());
+				uI.setNombre(u.getNombre());uI.setPagosForIdusuarioconductor(u.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(u.getPagosForIdusuariopasajero());
+				uI.setReservas(u.getReservas());uI.setSesioniniciada(u.getSesioniniciada());uI.setTelefono(u.getTelefono());
+				uI.setTelefonoverificado(u.getTelefonoverificado());uI.setValoracion(u.getValoracion());uI.setVehiculos(u.getVehiculos());uI.setViajes(u.getViajes());
+		    	return new ResponseEntity<UsuarioConIgnore>(uI,HttpStatus.OK);//Si existe el usuario y la clave es correcta devolvemos el usuario
+	    	}else {
+	    		return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);
+	    	}
+	    }else {
+	    		return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+	    }
 	}
 	
-	
 	//MOSTRAR USUARIO POR ID
-	@RequestMapping(value = "/consultarUsuarioPorId/{id}", method = RequestMethod.GET)//Definimos la URI a la que nos deben enviar las peticiones y 
-																						//el metodo http
-	public ResponseEntity<Usuario> consultaUsuarioPorId(@PathVariable("id") Integer id) {//Metodo que devuelve una entidad Usuario y recibe mediante el
+	@RequestMapping(value = "/consultarUsuarioPorId/{id}", method = RequestMethod.GET)//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
+	public ResponseEntity<UsuarioConIgnore> consultaUsuarioPorId(@PathVariable("id") Integer id) {//Metodo que devuelve una entidad Usuario y recibe mediante el
 																						//body un objeto de tipo usuario
 	 	Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(id);	//Llamamos al metodo del servicio consultaUsuarioPorId que nos devuelve un usuario
-	 		if(uOpt.isPresent()) {
-	 			Usuario u=uOpt.get();									//Si el usuario existe, lo devolvemos
-	 			return new ResponseEntity<Usuario>(u, HttpStatus.OK);
-	 		}else {														//Si el usuario NO existe devolvemos un código de error
-	 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-	 		}	
-		}
-	
+ 		if(uOpt.isPresent()) {
+ 			Usuario u=uOpt.get();									//Si el usuario existe, lo devolvemos
+ 			//Creamos un usuario con jsonignore
+			UsuarioConIgnore uI = new UsuarioConIgnore();
+			uI.setApellidos(u.getApellidos());uI.setClave(u.getClave());uI.setDescripcion(u.getDescripcion());
+			uI.setDoblefactoractivado(u.getDoblefactoractivado());uI.setEmail(u.getEmail());uI.setEmailverificado(u.getEmailverificado());
+			uI.setEsconductor(u.getEsconductor());uI.setEspasajero(u.getEspasajero());uI.setFechadesconexion(u.getFechadesconexion());
+			uI.setFechanacimiento(u.getFechanacimiento());uI.setFecharegistro(u.getFecharegistro());uI.setFotokyc(u.getFotokyc());
+			uI.setFotousuario(u.getFotousuario());uI.setIdusuario(u.getIdusuario());uI.setIncidencias(u.getIncidencias());
+			uI.setNombre(u.getNombre());uI.setPagosForIdusuarioconductor(u.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(u.getPagosForIdusuariopasajero());
+			uI.setReservas(u.getReservas());uI.setSesioniniciada(u.getSesioniniciada());uI.setTelefono(u.getTelefono());
+			uI.setTelefonoverificado(u.getTelefonoverificado());uI.setValoracion(u.getValoracion());uI.setVehiculos(u.getVehiculos());uI.setViajes(u.getViajes());
+ 			return new ResponseEntity<UsuarioConIgnore>(uI, HttpStatus.OK);
+ 		}else {														//Si el usuario NO existe devolvemos un código de error
+ 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+ 		}
+	}
 	
 	//ACTUALIZAR USUARIO
-	 @RequestMapping(value = "/actualizarUsuario", method = RequestMethod.PUT)//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
-	   	public ResponseEntity<Usuario> actualizaUsuarioPorID(@RequestBody Map<String, String> param) {//Metodo que actualiza los datos del usuario y 
-		 																								//devuelve el usuario actualizado
-		 
-		 	Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));	//Comprobamos que el usuario existe
-		 	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
-	    	
-		 	if(uOpt.isPresent()) {											//Si el usuario existe creamos una entidad usuario con los datos de la BD
-		 		Usuario u=uOpt.get();
-		 		
-		 		if(!param.get("telefono").equals("")) {						//Si el atributo telefono que nos han pasado tiene contenido lo verificamos
-		 			try {
-		 				Integer auxTelefono=Integer.parseInt(param.get("telefono"));	//Verificamos que el telefono sea de tipo Integer
-		 				if(param.get("telefono").length()==9) {							//si es de tipo Integer, comprobamos que sean 9 digitos
-		 					u.setTelefono(auxTelefono);									//si todo es correcto establecemos el nuevo telefono
-		 				}else {
-		 					return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);	//Si no tiene 9 digitos lanzamos un codigo de error
-		 				}
-		 			}catch(NumberFormatException n){	
-		 				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);		//Si no es de tipo Integer lanzamos un codigo de error
-		 			}
-		 		}
-		 		
-		 		if(!param.get("fechaNac").equals("")) {									//Comprobamos que el atributo fecha Nacimiento tiene contenido
-		 			u.setFechanacimiento(Date.valueOf(param.get("fechaNac")));			//si tiene contenido establecemos la nueva fecha
-		 		}
-		 		if(!param.get("descripcion").equals("") && !(param.get("descripcion").length()>300)) {								//Comprobamos que el altributo descripción tiene contenido
-		 			u.setDescripcion(param.get("descripcion"));							//si tiene contenido establecemos la nueva descripción
-		 		}
-		 		
-		 		return ResponseEntity.ok(UsuarioServicio.actualizaUsuario(u));			//Llamamos al metodo encargado de actualizar los datos
-		 	}else {
-		 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);				//Si el usuario no existe devolvemos un código de error
-		 	}
-	    
-	    		
-	   	}
-	 
-	 
-	 //ACTUALIZAR CLAVE DE USUARIO POR ID USUARIO
-	 @RequestMapping(value = "/actualizarClaveUsuario", method = RequestMethod.PUT) //Definimos la URI a la que nos deben enviar las peticiones 
-	 																				//y el metodo http
-	   	public ResponseEntity<Usuario> actualizaClaveUsuario(@RequestBody Map<String, String> param) { //Metodo encargado de actualizar la clave
-		 																								//del usuario
-		 	Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));								//Consultamos si el usuario existe mediante el
-		 	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);					//id de usuario
-	    	
-		 	if(uOpt.isPresent()) {														//Si el usuario existe
-		 		Usuario u=uOpt.get();													//Establecemos un usuario con los datos de la BD
-		 		String auxClaveActual=param.get("claveActual");							//Comprobamos que la clave actual es correcta
-		 		if(u.getClave().equals(auxClaveActual)) {								//Si la clave actual es correcta, comprobamos que la nueva
-		 																				//clave tiene un formato correcto
-		 			
-		 			boolean letraMayuscula=false, letraMinuscula=false, numero=false;
-		 			String auxNuevaClave=param.get("nuevaClave");						//Comprobamos que la clave tiene un formato correcto recorriendola
-		 			for(int i=0; i<auxNuevaClave.length() || letraMayuscula==false || letraMinuscula==false || numero==false;i++) {
-		 				if(auxNuevaClave.charAt(i)>'A' || auxNuevaClave.charAt(i)<'Z') { //Comprobamos que existe una letra mayuscula
-		 					letraMayuscula=true;
-		 				}
-		 				if(auxNuevaClave.charAt(i)>'a' || auxNuevaClave.charAt(i)<'z') { //Comprobamos que existe una letra minuscula
-		 					letraMinuscula=true;
-		 				}
-		 				
-		 				if(auxNuevaClave.charAt(i)>'0' || auxNuevaClave.charAt(i)<'9') { //Comprobamos que existe un numero
-		 					numero=true;
-		 				}
-		 			}
-		 			if(letraMayuscula==true && letraMinuscula==true && numero==true) {	//Si todas las comprobaciones son correctas
-		 				u.setClave(param.get("nuevaClave"));							//Asignamos la nueva clave
-			 			return ResponseEntity.ok(UsuarioServicio.actualizaUsuario(u));	//Llamamos al metodo encargado de actualizar los datos
-		 			}else {
-		 				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);		//Si falla alguna comprobación devolvemos un codigo de error
-		 			}
-		 			
-		 		}else {
-		 			return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);			//Si la clave introducida es incorrecta devolvemos un error
-		 		}
-		 		
-		 	}else {
-		 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);				//Si el usuario no existe devolvemos un codigo de error
-		 	}
-	    
-	    		
-	   	}
-	 
-	 
-	 //ELIMINAR USUARIO POR ID
-	 @RequestMapping(value = "/eliminarUsuario/{id}", method = RequestMethod.DELETE)//Definimos la URI a la que nos deben enviar las peticiones y el
-	 																				//el metodo http
-		public ResponseEntity<Usuario> eliminarUsuarioPorId(@PathVariable("id") Integer id) { //Metodo que elimina a un usuario por id
-		    Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(id);				//Comprobams si el usuario existe
-		    if (uOpt.isPresent()) {
-		    	Usuario u= uOpt.get();														//Si existe establecemos a un objeto usuario los valores 
-		    																				//asociados al id recibido
-		    	return new ResponseEntity<>(UsuarioServicio.eliminaUsuario(u),HttpStatus.OK);//Si existe eliminamos el usuario solicitado
-		    }else {	
-		    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);						//Si el usuario no existe devolvemos un código de error
-		    }
-		   
-		}
+	@RequestMapping(value = "/actualizarUsuario", method = RequestMethod.PUT)//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
+   	public ResponseEntity<UsuarioConIgnore> actualizaUsuarioPorID(@RequestBody Map<String, String> param) {//Metodo que actualiza los datos del usuario y 
+	 																								//devuelve el usuario actualizado
+	 	Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));	//Comprobamos que el usuario existe
+	 	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+    	
+	 	if(uOpt.isPresent()) {											//Si el usuario existe creamos una entidad usuario con los datos de la BD
+	 		Usuario u=uOpt.get();
+	 		if(!param.get("telefono").equals("")) {						//Si el atributo telefono que nos han pasado tiene contenido lo verificamos
+	 			try {
+	 				Integer auxTelefono=Integer.parseInt(param.get("telefono"));	//Verificamos que el telefono sea de tipo Integer
+	 				if(param.get("telefono").length()==9) {							//si es de tipo Integer, comprobamos que sean 9 digitos
+	 					u.setTelefono(auxTelefono);									//si todo es correcto establecemos el nuevo telefono
+	 				}else {
+	 					return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);	//Si no tiene 9 digitos lanzamos un codigo de error
+	 				}
+	 			}catch(NumberFormatException n){	
+	 				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);		//Si no es de tipo Integer lanzamos un codigo de error
+	 			}
+	 		}
+	 		if(!param.get("fechaNac").equals("")) {									//Comprobamos que el atributo fecha Nacimiento tiene contenido
+	 			u.setFechanacimiento(Date.valueOf(param.get("fechaNac")));			//si tiene contenido establecemos la nueva fecha
+	 		}
+	 		if(!param.get("descripcion").equals("") && !(param.get("descripcion").length()>300)) {								//Comprobamos que el altributo descripción tiene contenido
+	 			u.setDescripcion(param.get("descripcion"));							//si tiene contenido establecemos la nueva descripción
+	 		}
+	 		Usuario uA = UsuarioServicio.actualizaUsuario(u);
+	 		//Creamos un usuario con jsonignore
+			UsuarioConIgnore uI = new UsuarioConIgnore();
+			uI.setApellidos(uA.getApellidos());uI.setClave(uA.getClave());uI.setDescripcion(uA.getDescripcion());
+			uI.setDoblefactoractivado(uA.getDoblefactoractivado());uI.setEmail(uA.getEmail());uI.setEmailverificado(uA.getEmailverificado());
+			uI.setEsconductor(uA.getEsconductor());uI.setEspasajero(uA.getEspasajero());uI.setFechadesconexion(uA.getFechadesconexion());
+			uI.setFechanacimiento(uA.getFechanacimiento());uI.setFecharegistro(uA.getFecharegistro());uI.setFotokyc(uA.getFotokyc());
+			uI.setFotousuario(uA.getFotousuario());uI.setIdusuario(uA.getIdusuario());uI.setIncidencias(uA.getIncidencias());
+			uI.setNombre(uA.getNombre());uI.setPagosForIdusuarioconductor(uA.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(uA.getPagosForIdusuariopasajero());
+			uI.setReservas(uA.getReservas());uI.setSesioniniciada(uA.getSesioniniciada());uI.setTelefono(uA.getTelefono());
+			uI.setTelefonoverificado(uA.getTelefonoverificado());uI.setValoracion(uA.getValoracion());uI.setVehiculos(uA.getVehiculos());uI.setViajes(uA.getViajes());
+	 		return ResponseEntity.ok(uI);			//Llamamos al metodo encargado de actualizar los datos
+	 	}else {
+	 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);				//Si el usuario no existe devolvemos un código de error
+	 	}
+   	}
 
+	//ACTUALIZAR CLAVE DE USUARIO POR ID USUARIO
+	@RequestMapping(value = "/actualizarClaveUsuario", method = RequestMethod.PUT) //Definimos la URI a la que nos deben enviar las peticiones y el metodo http
+   	public ResponseEntity<UsuarioConIgnore> actualizaClaveUsuario(@RequestBody Map<String, String> param) { //Metodo encargado de actualizar la clave
+	 																								//del usuario
+	 	Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));								//Consultamos si el usuario existe mediante el
+	 	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);					//id de usuario
+	 	if(uOpt.isPresent()) {														//Si el usuario existe
+	 		Usuario u=uOpt.get();													//Establecemos un usuario con los datos de la BD
+	 		String auxClaveActual=param.get("claveActual");							//Comprobamos que la clave actual es correcta
+	 		if(u.getClave().equals(auxClaveActual)) {								//Si la clave actual es correcta, comprobamos que la nueva
+	 																				//clave tiene un formato correcto
+	 			boolean letraMayuscula=false, letraMinuscula=false, numero=false;
+	 			String auxNuevaClave=param.get("nuevaClave");						//Comprobamos que la clave tiene un formato correcto recorriendola
+	 			for(int i=0; i<auxNuevaClave.length() || letraMayuscula==false || letraMinuscula==false || numero==false;i++) {
+	 				if(auxNuevaClave.charAt(i)>'A' || auxNuevaClave.charAt(i)<'Z') { //Comprobamos que existe una letra mayuscula
+	 					letraMayuscula=true;
+	 				}
+	 				if(auxNuevaClave.charAt(i)>'a' || auxNuevaClave.charAt(i)<'z') { //Comprobamos que existe una letra minuscula
+	 					letraMinuscula=true;
+	 				}
+	 				
+	 				if(auxNuevaClave.charAt(i)>'0' || auxNuevaClave.charAt(i)<'9') { //Comprobamos que existe un numero
+	 					numero=true;
+	 				}
+	 			}
+	 			if(letraMayuscula==true && letraMinuscula==true && numero==true) {	//Si todas las comprobaciones son correctas
+	 				u.setClave(param.get("nuevaClave"));							//Asignamos la nueva clave
+	 		 		Usuario uA = UsuarioServicio.actualizaUsuario(u);
+	 		 		//Creamos un usuario con jsonignore
+	 				UsuarioConIgnore uI = new UsuarioConIgnore();
+	 				uI.setApellidos(uA.getApellidos());uI.setClave(uA.getClave());uI.setDescripcion(uA.getDescripcion());
+	 				uI.setDoblefactoractivado(uA.getDoblefactoractivado());uI.setEmail(uA.getEmail());uI.setEmailverificado(uA.getEmailverificado());
+	 				uI.setEsconductor(uA.getEsconductor());uI.setEspasajero(uA.getEspasajero());uI.setFechadesconexion(uA.getFechadesconexion());
+	 				uI.setFechanacimiento(uA.getFechanacimiento());uI.setFecharegistro(uA.getFecharegistro());uI.setFotokyc(uA.getFotokyc());
+	 				uI.setFotousuario(uA.getFotousuario());uI.setIdusuario(uA.getIdusuario());uI.setIncidencias(uA.getIncidencias());
+	 				uI.setNombre(uA.getNombre());uI.setPagosForIdusuarioconductor(uA.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(uA.getPagosForIdusuariopasajero());
+	 				uI.setReservas(uA.getReservas());uI.setSesioniniciada(uA.getSesioniniciada());uI.setTelefono(uA.getTelefono());
+	 				uI.setTelefonoverificado(uA.getTelefonoverificado());uI.setValoracion(uA.getValoracion());uI.setVehiculos(uA.getVehiculos());uI.setViajes(uA.getViajes());
+		 			return ResponseEntity.ok(uI);	//Llamamos al metodo encargado de actualizar los datos
+	 			}else {
+	 				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);		//Si falla alguna comprobación devolvemos un codigo de error
+	 			}
+	 		}else {
+	 			return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);			//Si la clave introducida es incorrecta devolvemos un error
+	 		}
+	 	}else {
+	 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);				//Si el usuario no existe devolvemos un codigo de error
+	 	}
+   	}
 	
- 
-	
+	//ELIMINAR USUARIO POR ID
+	@RequestMapping(value = "/eliminarUsuario/{id}", method = RequestMethod.DELETE)//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
+	public ResponseEntity<Usuario> eliminarUsuarioPorId(@PathVariable("id") Integer id) { //Metodo que elimina a un usuario por id
+	    Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(id);				//Comprobams si el usuario existe
+	    if (uOpt.isPresent()) {
+	    	Usuario u= uOpt.get();														//Si existe establecemos a un objeto usuario los valores 
+	    																				//asociados al id recibido
+	    	return new ResponseEntity<>(UsuarioServicio.eliminaUsuario(u),HttpStatus.OK);//Si existe eliminamos el usuario solicitado
+	    }else {	
+	    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);						//Si el usuario no existe devolvemos un código de error
+	    }
+	}
+
 	// ------------------------------VIAJES------------------------------
 		 
 	/* 
@@ -295,7 +312,7 @@ public class Controlador {
  	//REGISTRAR VEHICULO
  	//MATRICULA, MARCA, MODELO, COMBUSTIBLE Y COLOR
  	@RequestMapping(value = "/registrarVehiculo", method = RequestMethod.POST)
-	public ResponseEntity<Vehiculo> registraVehiculo(@Valid @RequestBody Map<String, String> param) {
+	public ResponseEntity<Void> registraVehiculo(@Valid @RequestBody Map<String, String> param) {
  		Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
  		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
  		if(uOpt.isPresent()) {
@@ -328,8 +345,8 @@ public class Controlador {
  			Usuario u=uOpt.get();
  			u.setEsconductor(true);
 			UsuarioServicio.actualizaUsuario(u);
- 			
- 			return new ResponseEntity<Vehiculo>(VehiculoServicio.registraVehiculo(v), HttpStatus.OK);
+			VehiculoServicio.registraVehiculo(v);//CORREGIR RESPUESTA RECURSIVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+ 			return new ResponseEntity<>(null, HttpStatus.OK);
  		}else {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
  		}
