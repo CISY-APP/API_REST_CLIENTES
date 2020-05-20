@@ -3,12 +3,11 @@ package com.cisyapp.rest.controlador;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +16,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import com.cisyapp.rest.modelo.Usuario;
 import com.cisyapp.rest.modelo.UsuarioConIgnore;
 import com.cisyapp.rest.modelo.Vehiculo;
+import com.cisyapp.rest.modelo.VehiculoConIgnore;
 import com.cisyapp.rest.modelo.Viaje;
 import com.cisyapp.rest.servicio.IncidenciaServicio;
 import com.cisyapp.rest.servicio.UsuarioServicio;
 import com.cisyapp.rest.servicio.VehiculoServicio;
 import com.cisyapp.rest.servicio.ViajeServicio;
-
-
-
 
 @Controller
 public class Controlador {
@@ -308,11 +304,10 @@ public class Controlador {
  	
  // ------------------------------VEHICULOS------------------------------
  	
- 	
  	//REGISTRAR VEHICULO
  	//MATRICULA, MARCA, MODELO, COMBUSTIBLE Y COLOR
  	@RequestMapping(value = "/registrarVehiculo", method = RequestMethod.POST)
-	public ResponseEntity<Void> registraVehiculo(@Valid @RequestBody Map<String, String> param) {
+	public ResponseEntity<VehiculoConIgnore> registraVehiculo(@Valid @RequestBody Map<String, String> param) {
  		Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
  		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
  		if(uOpt.isPresent()) {
@@ -334,7 +329,6 @@ public class Controlador {
  			}else {
  				return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);	
  			}
- 			
  			Vehiculo v=new Vehiculo();
  			v.setUsuario(uOpt.get());
  			v.setMatricula(auxMatricula);
@@ -345,44 +339,63 @@ public class Controlador {
  			Usuario u=uOpt.get();
  			u.setEsconductor(true);
 			UsuarioServicio.actualizaUsuario(u);
-			VehiculoServicio.registraVehiculo(v);//CORREGIR RESPUESTA RECURSIVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
- 			return new ResponseEntity<>(null, HttpStatus.OK);
+			Vehiculo vR = VehiculoServicio.registraVehiculo(v);
+	 		//Creamos un vehiculo con jsonignore
+			VehiculoConIgnore vI = new VehiculoConIgnore();
+			vI.setColor(vR.getColor());vI.setCombustible(vR.getCombustible());vI.setFechadealta(vR.getFechadealta());
+			vI.setFotovehiculo(vR.getFotovehiculo());vI.setIdvehiculo(vR.getIdvehiculo());vI.setMarca(vR.getMarca());
+			vI.setMatricula(vR.getMatricula());vI.setModelo(vR.getModelo());vI.setPlazas(vR.getPlazas());
+			vI.setUsuario(vR.getUsuario());vI.setViajes(vR.getViajes());
+ 			return new ResponseEntity<>(vI, HttpStatus.OK);
  		}else {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
  		}
 	}
  	
- 	
- 	
- 	
  	//MOSTRAR VEHICULOS POR ID DE USUARIO
  	@RequestMapping(value = "/consultarVehiculoPorIdUsuario/{id}", method = RequestMethod.GET)
-	public ResponseEntity<List<Vehiculo>> consultaVehiculoPorIdUsuario(@PathVariable("id") Integer id) {
+	public ResponseEntity<List<VehiculoConIgnore>> consultaVehiculoPorIdUsuario(@PathVariable("id") Integer id) {
  		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(id);
  		if(uOpt.isPresent()) {
- 			return new ResponseEntity<List<Vehiculo>>(VehiculoServicio.consultaVehiculosPorIdUsuario(id), HttpStatus.OK);
+ 			List<Vehiculo> listaOriginal = VehiculoServicio.consultaVehiculosPorIdUsuario(id);
+ 		 	List<VehiculoConIgnore> listaAuxiliar = new ArrayList<VehiculoConIgnore>();
+ 		 	for (Vehiculo vl : listaOriginal) {
+ 		 		VehiculoConIgnore v = new VehiculoConIgnore();
+ 		 		v.setColor(vl.getColor());v.setCombustible(vl.getCombustible());v.setFechadealta(vl.getFechadealta());
+ 				v.setFotovehiculo(vl.getFotovehiculo());v.setIdvehiculo(vl.getIdvehiculo());v.setMarca(vl.getMarca());
+ 				v.setMatricula(vl.getMatricula());v.setModelo(vl.getModelo());v.setPlazas(vl.getPlazas());
+ 				v.setUsuario(vl.getUsuario());v.setViajes(vl.getViajes());
+				listaAuxiliar.add(v);
+ 			}
+ 			return new ResponseEntity<List<VehiculoConIgnore>>(listaAuxiliar, HttpStatus.OK);
  		}else {
- 			return new ResponseEntity<List<Vehiculo>>(HttpStatus.NOT_FOUND);
+ 			return new ResponseEntity<List<VehiculoConIgnore>>(HttpStatus.NOT_FOUND);
  		}	
 	}
  	
- 	
  	//MOSTRAR VEHICULO POR MATRICULA
  	@RequestMapping(value = "/consultarVehiculoPorMatricula/{matricula}", method = RequestMethod.GET)
- 	public ResponseEntity<Vehiculo>consultaVehiculoPorMatricula(@PathVariable("matricula") String matricula) {
+ 	public ResponseEntity<VehiculoConIgnore>consultaVehiculoPorMatricula(@PathVariable("matricula") String matricula) {
  	 	Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(matricula);
  	 	if(vOpt.isPresent()) {
  	 		Vehiculo v=vOpt.get();
- 	 		return new ResponseEntity<Vehiculo>(v, HttpStatus.OK);
+ 	 		VehiculoConIgnore vI = new VehiculoConIgnore();
+	 		vI.setColor(v.getColor());vI.setCombustible(v.getCombustible());vI.setFechadealta(v.getFechadealta());
+			vI.setFotovehiculo(v.getFotovehiculo());vI.setIdvehiculo(v.getIdvehiculo());vI.setMarca(v.getMarca());
+			vI.setMatricula(v.getMatricula());vI.setModelo(v.getModelo());vI.setPlazas(v.getPlazas());
+			vI.setUsuario(v.getUsuario());vI.setViajes(v.getViajes());
+ 	 		return new ResponseEntity<VehiculoConIgnore>(vI, HttpStatus.OK);
  	 	}else {
  	 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
  	 	}	
  	}
  	
  	
+ 	
+ 	//HACER COMO CON ACTUALIZAR USUARIO Y HACER METODO POR MATRICULA TAMBIEN
  	//ACTUALIZAR VEHICULO
  	@RequestMapping(value = "/actualizarVehiculo", method = RequestMethod.PUT)
-	public ResponseEntity<Vehiculo> actualizaVehiculo(@Valid @RequestBody Map<String, String> param) {
+	public ResponseEntity<VehiculoConIgnore> actualizaVehiculo(@Valid @RequestBody Map<String, String> param) {
  		try {
  			Integer auxIdVehiculo=Integer.parseInt(param.get("id"));
  			Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorId(auxIdVehiculo);
@@ -392,49 +405,43 @@ public class Controlador {
  	 			vOpt.get().setMarca(param.get("combustible"));
  	 			vOpt.get().setMarca(param.get("color"));
  	 			Vehiculo v=vOpt.get();
- 	 			return ResponseEntity.ok(VehiculoServicio.actualizaVehiculo(v));
+ 	 			v = VehiculoServicio.actualizaVehiculo(v);
+ 	 			VehiculoConIgnore vI = new VehiculoConIgnore();
+ 		 		vI.setColor(v.getColor());vI.setCombustible(v.getCombustible());vI.setFechadealta(v.getFechadealta());
+ 				vI.setFotovehiculo(v.getFotovehiculo());vI.setIdvehiculo(v.getIdvehiculo());vI.setMarca(v.getMarca());
+ 				vI.setMatricula(v.getMatricula());vI.setModelo(v.getModelo());vI.setPlazas(v.getPlazas());
+ 				vI.setUsuario(v.getUsuario());vI.setViajes(v.getViajes());
+ 	 			return ResponseEntity.ok(vI);
  	 		}else {
  	 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
  	 		}
- 	 		
  		}catch(NumberFormatException n) {
  			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
  		}
- 		
- 		
- 			
- 		
  	}
  	
  	
- 	
- 	
+ 	//HACER METODO POR MATRICULA TAMBIEN
  	//ELIMINAR VEHICULO POR ID
  	//Metodo que recibe un Integer con el Id a del Producto a eliminar desde la ruta de la petición y lo elimina si existe
- 		@RequestMapping(value = "/eliminarVehiculo/{id}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta
- 		public ResponseEntity<Vehiculo> eliminarVehiculoPorId(@PathVariable("id") Integer id) {
- 		    Optional<Vehiculo> vOpt=VehiculoServicio.consultaVehiculoPorId(id);
- 		    if (vOpt.isPresent()) {
- 		    	Vehiculo v= vOpt.get();
- 		    	Integer auxIdUsuario=v.getUsuario().getIdusuario();
- 		    	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
- 		    	Usuario u=uOpt.get();
- 		    	VehiculoServicio.eliminaVehiculo(v);//Si el vehiculo existe, llamamos al metodo eliminar del servicio
- 		    	Integer numVehiculos=VehiculoServicio.cuentaVehiculoPorIdUsuario(auxIdUsuario);
- 		    	if(numVehiculos==0) {
- 		    		u.setEsconductor(false);
- 		    		UsuarioServicio.actualizaUsuario(u);
- 		    	}
- 		    	
- 		    	return new ResponseEntity<>(null,HttpStatus.OK);//Si existe eliminamos el vehiculo solicitado
- 		    }
- 		    else {
- 		    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
- 		    }
- 		 }
-
-
- 
- 	
- 	
+	@RequestMapping(value = "/eliminarVehiculo/{id}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta
+	public ResponseEntity<Vehiculo> eliminarVehiculoPorId(@PathVariable("id") Integer id) {
+	    Optional<Vehiculo> vOpt=VehiculoServicio.consultaVehiculoPorId(id);
+	    if (vOpt.isPresent()) {
+	    	Vehiculo v= vOpt.get();
+	    	Integer auxIdUsuario=v.getUsuario().getIdusuario();
+	    	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+	    	Usuario u=uOpt.get();
+	    	VehiculoServicio.eliminaVehiculo(v);//Si el vehiculo existe, llamamos al metodo eliminar del servicio
+	    	Integer numVehiculos=VehiculoServicio.cuentaVehiculoPorIdUsuario(auxIdUsuario);
+	    	if(numVehiculos==0) {
+	    		u.setEsconductor(false);
+	    		UsuarioServicio.actualizaUsuario(u);
+	    	}
+	    	return new ResponseEntity<>(null,HttpStatus.OK);//Si existe eliminamos el vehiculo solicitado
+	    }
+	    else {
+	    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+	    }
+	 }
 }
