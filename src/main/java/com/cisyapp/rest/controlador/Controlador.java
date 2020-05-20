@@ -101,14 +101,15 @@ public class Controlador {
 	}
 	
 	//MOSTRAR USUARIO POR ID
-	@RequestMapping(value = "/consultarUsuarioPorId/{id}", method = RequestMethod.GET)//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
-	public ResponseEntity<UsuarioConIgnore> consultaUsuarioPorId(@PathVariable("id") Integer id) {//Metodo que devuelve una entidad Usuario y recibe mediante el
-																						//body un objeto de tipo usuario
+	@RequestMapping(value = "/consultarUsuarioPorId/{id}", method = RequestMethod.GET)//Definimos la URI a la que nos deben enviar las peticiones y el
+																						//metodo http
+	public ResponseEntity<UsuarioConIgnore> consultaUsuarioPorId(@PathVariable("id") Integer id) {//Metodo que devuelve una entidad  
+																						//Usuario y recibe mediante el body un objeto de tipo usuario
 	 	Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(id);	//Llamamos al metodo del servicio consultaUsuarioPorId que nos devuelve un usuario
  		if(uOpt.isPresent()) {
  			Usuario u=uOpt.get();									//Si el usuario existe, lo devolvemos
- 			//Creamos un usuario con jsonignore
-			UsuarioConIgnore uI = new UsuarioConIgnore();
+ 																	
+			UsuarioConIgnore uI = new UsuarioConIgnore();	//Creamos un usuario con jsonignore
 			uI.setApellidos(u.getApellidos());uI.setClave(u.getClave());uI.setDescripcion(u.getDescripcion());
 			uI.setDoblefactoractivado(u.getDoblefactoractivado());uI.setEmail(u.getEmail());uI.setEmailverificado(u.getEmailverificado());
 			uI.setEsconductor(u.getEsconductor());uI.setEspasajero(u.getEspasajero());uI.setFechadesconexion(u.getFechadesconexion());
@@ -174,9 +175,9 @@ public class Controlador {
 	 	Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));								//Consultamos si el usuario existe mediante el
 	 	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);					//id de usuario
 	 	if(uOpt.isPresent()) {														//Si el usuario existe
-	 		Usuario u=uOpt.get();													//Establecemos un usuario con los datos de la BD
+	 		//Usuario u=uOpt.get();													//Establecemos un usuario con los datos de la BD
 	 		String auxClaveActual=param.get("claveActual");							//Comprobamos que la clave actual es correcta
-	 		if(u.getClave().equals(auxClaveActual)) {								//Si la clave actual es correcta, comprobamos que la nueva
+	 		if(uOpt.get().getClave().equals(auxClaveActual)) {								//Si la clave actual es correcta, comprobamos que la nueva
 	 																				//clave tiene un formato correcto
 	 			boolean letraMayuscula=false, letraMinuscula=false, numero=false;
 	 			String auxNuevaClave=param.get("nuevaClave");						//Comprobamos que la clave tiene un formato correcto recorriendola
@@ -193,18 +194,20 @@ public class Controlador {
 	 				}
 	 			}
 	 			if(letraMayuscula==true && letraMinuscula==true && numero==true) {	//Si todas las comprobaciones son correctas
-	 				u.setClave(param.get("nuevaClave"));							//Asignamos la nueva clave
-	 		 		Usuario uA = UsuarioServicio.actualizaUsuario(u);
-	 		 		//Creamos un usuario con jsonignore
-	 				UsuarioConIgnore uI = new UsuarioConIgnore();
-	 				uI.setApellidos(uA.getApellidos());uI.setClave(uA.getClave());uI.setDescripcion(uA.getDescripcion());
-	 				uI.setDoblefactoractivado(uA.getDoblefactoractivado());uI.setEmail(uA.getEmail());uI.setEmailverificado(uA.getEmailverificado());
-	 				uI.setEsconductor(uA.getEsconductor());uI.setEspasajero(uA.getEspasajero());uI.setFechadesconexion(uA.getFechadesconexion());
-	 				uI.setFechanacimiento(uA.getFechanacimiento());uI.setFecharegistro(uA.getFecharegistro());uI.setFotokyc(uA.getFotokyc());
-	 				uI.setFotousuario(uA.getFotousuario());uI.setIdusuario(uA.getIdusuario());uI.setIncidencias(uA.getIncidencias());
-	 				uI.setNombre(uA.getNombre());uI.setPagosForIdusuarioconductor(uA.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(uA.getPagosForIdusuariopasajero());
-	 				uI.setReservas(uA.getReservas());uI.setSesioniniciada(uA.getSesioniniciada());uI.setTelefono(uA.getTelefono());
-	 				uI.setTelefonoverificado(uA.getTelefonoverificado());uI.setValoracion(uA.getValoracion());uI.setVehiculos(uA.getVehiculos());uI.setViajes(uA.getViajes());
+	 				uOpt.get().setClave(param.get("nuevaClave"));							//Asignamos la nueva clave
+	 		 		Usuario u = uOpt.get();
+	 		 		UsuarioServicio.actualizaUsuario(u);
+	 		 		
+	 		 		
+	 				UsuarioConIgnore uI = new UsuarioConIgnore();	//Creamos un usuario con jsonignore
+	 				uI.setApellidos(u.getApellidos());uI.setClave(u.getClave());uI.setDescripcion(u.getDescripcion());
+	 				uI.setDoblefactoractivado(u.getDoblefactoractivado());uI.setEmail(u.getEmail());uI.setEmailverificado(u.getEmailverificado());
+	 				uI.setEsconductor(u.getEsconductor());uI.setEspasajero(u.getEspasajero());uI.setFechadesconexion(u.getFechadesconexion());
+	 				uI.setFechanacimiento(u.getFechanacimiento());uI.setFecharegistro(u.getFecharegistro());uI.setFotokyc(u.getFotokyc());
+	 				uI.setFotousuario(u.getFotousuario());uI.setIdusuario(u.getIdusuario());uI.setIncidencias(u.getIncidencias());
+	 				uI.setNombre(u.getNombre());uI.setPagosForIdusuarioconductor(u.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(u.getPagosForIdusuariopasajero());
+	 				uI.setReservas(u.getReservas());uI.setSesioniniciada(u.getSesioniniciada());uI.setTelefono(u.getTelefono());
+	 				uI.setTelefonoverificado(u.getTelefonoverificado());uI.setValoracion(u.getValoracion());uI.setVehiculos(u.getVehiculos());uI.setViajes(u.getViajes());
 		 			return ResponseEntity.ok(uI);	//Llamamos al metodo encargado de actualizar los datos
 	 			}else {
 	 				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);		//Si falla alguna comprobación devolvemos un codigo de error
@@ -351,6 +354,7 @@ public class Controlador {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
  		}
 	}
+
  	
  	//MOSTRAR VEHICULOS POR ID DE USUARIO
  	@RequestMapping(value = "/consultarVehiculoPorIdUsuario/{id}", method = RequestMethod.GET)
@@ -411,10 +415,8 @@ public class Controlador {
  	 		}
  	 		
  	}
- 	
- 	
- 	
 
+ 	
  	//ACTUALIZAR VEHICULO POR MATRICULA
  	@RequestMapping(value = "/actualizarVehiculo", method = RequestMethod.PUT)
 	public ResponseEntity<VehiculoConIgnore> actualizaVehiculo(@Valid @RequestBody Map<String, String> param) {
