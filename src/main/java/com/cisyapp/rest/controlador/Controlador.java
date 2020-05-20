@@ -263,7 +263,7 @@ public class Controlador {
  		if(uOpt.isPresent()) {
  			if(uOpt.get().getEsconductor()==true) {
  				String auxMatricula=param.get("matricula");
- 				Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(auxMatricula);
+ 				Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorMatricula(auxMatricula);
  				if(vOpt.get().getUsuario().getIdusuario()==auxIdUsuario) {
  					String auxOrigen=param.get("origen");
  	 				String auxDestino=param.get("destino");
@@ -376,29 +376,52 @@ public class Controlador {
  	//MOSTRAR VEHICULO POR MATRICULA
  	@RequestMapping(value = "/consultarVehiculoPorMatricula/{matricula}", method = RequestMethod.GET)
  	public ResponseEntity<VehiculoConIgnore>consultaVehiculoPorMatricula(@PathVariable("matricula") String matricula) {
- 	 	Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(matricula);
- 	 	if(vOpt.isPresent()) {
- 	 		Vehiculo v=vOpt.get();
- 	 		VehiculoConIgnore vI = new VehiculoConIgnore();
-	 		vI.setColor(v.getColor());vI.setCombustible(v.getCombustible());vI.setFechadealta(v.getFechadealta());
-			vI.setFotovehiculo(v.getFotovehiculo());vI.setIdvehiculo(v.getIdvehiculo());vI.setMarca(v.getMarca());
-			vI.setMatricula(v.getMatricula());vI.setModelo(v.getModelo());vI.setPlazas(v.getPlazas());
-			vI.setUsuario(v.getUsuario());vI.setViajes(v.getViajes());
- 	 		return new ResponseEntity<VehiculoConIgnore>(vI, HttpStatus.OK);
- 	 	}else {
- 	 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
- 	 	}	
+ 	 	
+ 		matricula=matricula.replaceAll("\\s","").toUpperCase();
+			if(matricula.length()==7) {
+				try {
+					Integer.parseInt(matricula.substring(0, 4));
+					boolean pruebaLetras=true;
+					for(int i = 4 ; i < matricula.length() && pruebaLetras ; i++ ) {
+						if(matricula.charAt(i)<'A'||matricula.charAt(i)>'Z') {
+							pruebaLetras=false;
+							return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+						}
+					}
+				}catch (NumberFormatException n){
+					return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+				}
+				
+			}else {
+				return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);	
+			}
+			
+			Optional<Vehiculo> vOpt=VehiculoServicio.consultaVehiculoPorMatricula(matricula);
+ 	 		if(vOpt.isPresent()) {
+ 	 			VehiculoConIgnore vI=new VehiculoConIgnore();
+ 	 			vI.setUsuario(vOpt.get().getUsuario());
+ 	 			vI.setMatricula(matricula);
+ 	 			vI.setMarca(vOpt.get().getMarca());
+ 	 			vI.setModelo(vOpt.get().getModelo());
+ 	 			vI.setColor(vOpt.get().getColor());
+ 	 			vI.setCombustible(vOpt.get().getCombustible());
+ 	 			return new ResponseEntity<VehiculoConIgnore>(vI, HttpStatus.OK);
+ 	 		}else {
+ 	 			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+ 	 		}
+ 	 		
  	}
  	
  	
  	
- 	//HACER COMO CON ACTUALIZAR USUARIO Y HACER METODO POR MATRICULA TAMBIEN
- 	//ACTUALIZAR VEHICULO
+
+ 	//ACTUALIZAR VEHICULO POR MATRICULA
  	@RequestMapping(value = "/actualizarVehiculo", method = RequestMethod.PUT)
 	public ResponseEntity<VehiculoConIgnore> actualizaVehiculo(@Valid @RequestBody Map<String, String> param) {
  		try {
- 			Integer auxIdVehiculo=Integer.parseInt(param.get("id"));
- 			Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorId(auxIdVehiculo);
+ 			String auxMatriculaVehiculo=param.get("matricula");
+ 			
+ 			Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorMatricula(auxMatriculaVehiculo);
  	 		if(vOpt.isPresent()) {
  	 			vOpt.get().setMarca(param.get("marca"));
  	 			vOpt.get().setMarca(param.get("modelo"));
@@ -421,7 +444,50 @@ public class Controlador {
  	}
  	
  	
- 	//HACER METODO POR MATRICULA TAMBIEN
+ 	//ELIMINAR VEHICULO POR MATRICULA
+ 	 	//Metodo que recibe un Integer con el Id a del Producto a eliminar desde la ruta de la petición y lo elimina si existe
+ 		@RequestMapping(value = "/eliminarVehiculoPorMatricula/{matricula}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta
+ 		public ResponseEntity<Vehiculo> eliminarVehiculoPorId(@PathVariable("matricula") String matricula) {
+ 			
+ 			matricula=matricula.replaceAll("\\s","").toUpperCase();
+			if(matricula.length()==7) {
+				try {
+					Integer.parseInt(matricula.substring(0, 4));
+					boolean pruebaLetras=true;
+					for(int i = 4 ; i < matricula.length() && pruebaLetras ; i++ ) {
+						if(matricula.charAt(i)<'A'||matricula.charAt(i)>'Z') {
+							pruebaLetras=false;
+							return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+						}
+					}
+				}catch (NumberFormatException n){
+					return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+				}
+				
+			}else {
+				return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);	
+			}
+ 			
+ 		    Optional<Vehiculo> vOpt=VehiculoServicio.consultaVehiculoPorMatricula(matricula);
+ 		    if (vOpt.isPresent()) {
+ 		    	Vehiculo v= vOpt.get();
+ 		    	Integer auxIdUsuario=v.getUsuario().getIdusuario();
+ 		    	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+ 		    	Usuario u=uOpt.get();
+ 		    	VehiculoServicio.eliminaVehiculo(v);//Si el vehiculo existe, llamamos al metodo eliminar del servicio
+ 		    	Integer numVehiculos=VehiculoServicio.cuentaVehiculoPorIdUsuario(auxIdUsuario);
+ 		    	if(numVehiculos==0) {
+ 		    		u.setEsconductor(false);
+ 		    		UsuarioServicio.actualizaUsuario(u);
+ 		    	}
+ 		    	return new ResponseEntity<>(null,HttpStatus.OK);//Si existe eliminamos el vehiculo solicitado
+ 		    }
+ 		    else {
+ 		    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+ 		    }
+ 		 }
+
+ 	
  	//ELIMINAR VEHICULO POR ID
  	//Metodo que recibe un Integer con el Id a del Producto a eliminar desde la ruta de la petición y lo elimina si existe
 	@RequestMapping(value = "/eliminarVehiculo/{id}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta

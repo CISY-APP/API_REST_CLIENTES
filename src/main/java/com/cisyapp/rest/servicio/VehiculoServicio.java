@@ -38,7 +38,7 @@ public class VehiculoServicio{
 		}
 	
 	//Metodo para consultar vehiculos filtrando por Id de Usuario
-	public Optional<Vehiculo> consultarVehiculoPorMatricula(String matricula){
+	public Optional<Vehiculo> consultaVehiculoPorMatricula(String matricula){
 		return VehiculoRepositorio.findBymatricula(matricula);
 		}
 	
