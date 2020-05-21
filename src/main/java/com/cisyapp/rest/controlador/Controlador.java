@@ -21,6 +21,7 @@ import com.cisyapp.rest.modelo.UsuarioConIgnore;
 import com.cisyapp.rest.modelo.Vehiculo;
 import com.cisyapp.rest.modelo.VehiculoConIgnore;
 import com.cisyapp.rest.modelo.Viaje;
+import com.cisyapp.rest.modelo.ViajeConIgnore;
 import com.cisyapp.rest.servicio.IncidenciaServicio;
 import com.cisyapp.rest.servicio.UsuarioServicio;
 import com.cisyapp.rest.servicio.VehiculoServicio;
@@ -42,7 +43,8 @@ public class Controlador {
 	private VehiculoServicio VehiculoServicio;
 
 	
-	// ------------------------------USUARIOS------------------------------
+	
+	// -------------------------------------------------------------USUARIOS----------------------------------------------------------------------- //
 	
 	//REGISTRO USUARIOS 
 	@RequestMapping(value = "/registrarUsuario", method = RequestMethod.POST) //Definimos la URI a la que nos deben enviar las peticiones y el metodo http
@@ -51,16 +53,16 @@ public class Controlador {
 		String auxClave=usuario.getClave(); 								//Comprobación de que la clave de usuario esta formada correctamente
 		boolean letraMayuscula=false, letraMinuscula=false, numero=false;	//debe tener 1 mayusucula, 1 minuscula y un numero
 		
-			for(int i=0; i<auxClave.length() || letraMayuscula==false || letraMinuscula==false || numero==false;i++) {//Recorremos el String para comprobar
+			for(int i=0; i<auxClave.length();i++) {//Recorremos el String para comprobar
 																														//que contiene el formato correcto
-				if(auxClave.charAt(i)>'A' || auxClave.charAt(i)<'Z') {	//Si encontramos una mayuscula actualizamos el boolean a true
+				if(auxClave.charAt(i)>='A' && auxClave.charAt(i)<='Z') {	//Si encontramos una mayuscula actualizamos el boolean a true
 					letraMayuscula=true;
 				}
-				if(auxClave.charAt(i)>'a' || auxClave.charAt(i)<'z') {	//Si encontramos una minuscula actualizamos el boolean a true
+				if(auxClave.charAt(i)>='a' && auxClave.charAt(i)<='z') {	//Si encontramos una minuscula actualizamos el boolean a true
 					letraMinuscula=true;
 				}
 				
-				if(auxClave.charAt(i)>'0' || auxClave.charAt(i)<'9') {	//Si encontramos un numero actualizamos el boolean a true
+				if(auxClave.charAt(i)>='0' && auxClave.charAt(i)<='9') {	//Si encontramos un numero actualizamos el boolean a true
 					numero=true;
 				}
 			}
@@ -233,7 +235,9 @@ public class Controlador {
 	    }
 	}
 
-	// ------------------------------VIAJES------------------------------
+	
+	
+	// ---------------------------------------------------------------VIAJES------------------------------------------------------------------------- //
 		 
 	/* 
 	// REGISTRO VIAJES OBJETOS
@@ -260,29 +264,70 @@ public class Controlador {
 		 
 	//REGISTRAR VIAJE
 	@RequestMapping(value = "/registrarViaje", method = RequestMethod.POST)
-	public ResponseEntity<Viaje> registraViaje(@RequestBody Map<String, String> param) {
+	public ResponseEntity<ViajeConIgnore> registraViaje(@RequestBody Map<String, String> param) {
  		Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
  		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
  		if(uOpt.isPresent()) {
  			if(uOpt.get().getEsconductor()==true) {
  				String auxMatricula=param.get("matricula");
+ 				if(auxMatricula.length()==7) {
+ 	 				try {
+ 	 					Integer.parseInt(auxMatricula.substring(0, 4));
+ 	 					boolean pruebaLetras=true;
+ 	 					for(int i = 4 ; i < auxMatricula.length() && pruebaLetras ; i++ ) {
+ 	 						if(auxMatricula.charAt(i)<'A'||auxMatricula.charAt(i)>'Z') {
+ 	 							pruebaLetras=false;
+ 	 							return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+ 	 						}
+ 	 					}
+ 	 				}catch (NumberFormatException n){
+ 	 					return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+ 	 				}
+ 	 			}else {
+ 	 				return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+ 	 			}
  				Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorMatricula(auxMatricula);
- 				if(vOpt.get().getUsuario().getIdusuario()==auxIdUsuario) {
- 					String auxOrigen=param.get("origen");
- 	 				String auxDestino=param.get("destino");
- 	 				int auxNumPlazas=Integer.parseInt(param.get("numPlazas"));
- 	 				Date auxFecha=Date.valueOf(param.get("fecha"));
- 	 				Date auxHora=Date.valueOf(param.get("horaSalida"));
- 	 				Long precioAux=Long.valueOf(param.get("precio"));
- 	 				BigDecimal auxPrecio=BigDecimal.valueOf(precioAux);
- 	 				Viaje v=new Viaje(uOpt.get(), vOpt.get(), auxOrigen, auxDestino, auxNumPlazas, auxFecha);
- 	 				return new ResponseEntity<Viaje>(ViajeServicio.registraViaje(v), HttpStatus.OK);
+ 				if(vOpt.isPresent()) {
+ 					if(vOpt.get().getUsuario().getIdusuario()==auxIdUsuario) {
+ 	 					String auxOrigen=param.get("origen");
+ 	 	 				String auxDestino=param.get("destino");
+ 	 	 				int auxNumPlazas=Integer.parseInt(param.get("numPlazas"));
+ 	 	 				Date auxFecha=Date.valueOf(param.get("fecha"));
+ 	 	 				//Date auxHora=Date.valueOf(param.get("horaSalida"));
+ 	 	 				Long precioAux=Long.valueOf(param.get("precio"));
+ 	 	 				BigDecimal auxPrecio=BigDecimal.valueOf(precioAux);
+ 	 	 				Viaje v=new Viaje();
+ 	 	 				v.setUsuario(uOpt.get());
+ 	 	 				v.setVehiculo(vOpt.get());
+ 	 	 				v.setOrigen(auxOrigen);
+ 	 	 				v.setDestino(auxDestino);
+ 	 	 				v.setNumplazasdisponibles(auxNumPlazas);
+ 	 	 				v.setFechasalida(auxFecha);
+ 	 	 				//v.setHorasalida(auxHora);
+ 	 	 				v.setPrecio(auxPrecio);
+ 	 	 				ViajeServicio.registraViaje(v);
+ 	 	 				
+ 	 	 				ViajeConIgnore vI=new ViajeConIgnore();
+ 	 	 				vI.setUsuario(v.getUsuario());
+ 	 	 				vI.setVehiculo(v.getVehiculo());
+ 	 	 				vI.setOrigen(v.getOrigen());
+ 	 	 				vI.setDestino(v.getDestino());
+ 	 	 				vI.setNumplazasdisponibles(v.getNumplazasdisponibles());
+ 	 	 				vI.setFechasalida(v.getFechasalida());
+ 	 	 				//vI.setHorasalida(v.getHorasalida());
+ 	 	 				vI.setPrecio(v.getPrecio());
+ 	 	 				return new ResponseEntity<>(vI, HttpStatus.OK);
+ 	 				}else {
+ 	 					return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+ 	 				}
+ 					
  				}else {
- 					return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+ 					return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
  				}
  				
+ 				
 			}else {
-				return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);
+				return new ResponseEntity<>(null,HttpStatus.CONFLICT);
 			}
  		}else {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
@@ -300,12 +345,12 @@ public class Controlador {
  	
  	
  	
- // ------------------------------INCIDENCIAS------------------------------
+ // -------------------------------------------------------------INCIDENCIAS----------------------------------------------------------------------- //
  	
  	
  	
- 	
- // ------------------------------VEHICULOS------------------------------
+ // --------------------------------------------------------------VEHICULOS------------------------------------------------------------------------ //
+ 
  	
  	//REGISTRAR VEHICULO
  	//MATRICULA, MARCA, MODELO, COMBUSTIBLE Y COLOR
