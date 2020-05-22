@@ -467,13 +467,12 @@ public class Controlador {
 	public ResponseEntity<VehiculoConIgnore> actualizaVehiculo(@Valid @RequestBody Map<String, String> param) {
  		try {
  			String auxMatriculaVehiculo=param.get("matricula");
- 			
  			Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorMatricula(auxMatriculaVehiculo);
  	 		if(vOpt.isPresent()) {
  	 			vOpt.get().setMarca(param.get("marca"));
- 	 			vOpt.get().setMarca(param.get("modelo"));
- 	 			vOpt.get().setMarca(param.get("combustible"));
- 	 			vOpt.get().setMarca(param.get("color"));
+ 	 			vOpt.get().setModelo(param.get("modelo"));
+ 	 			vOpt.get().setCombustible(param.get("combustible"));
+ 	 			vOpt.get().setColor(param.get("color"));
  	 			Vehiculo v=vOpt.get();
  	 			v = VehiculoServicio.actualizaVehiculo(v);
  	 			VehiculoConIgnore vI = new VehiculoConIgnore();
