@@ -37,11 +37,11 @@ public class Usuario implements java.io.Serializable {
 	private Integer idusuario;
 	@NotNull	
 	@Size(min=1, max=20)
-	@Pattern(regexp = "[a-z A-Z]+", message="El nombre solo puede estar formado por letras")
+	@Pattern(regexp = "[a-z A-ZñáéíóúÑÁÉÍÓÚ]+", message="El nombre solo puede estar formado por letras")
 	private String nombre;
 	@NotNull
 	@Size(min=1, max=20)
-	@Pattern(regexp = "[a-z A-Z]+", message="Los apellidos solo pueden estar formados por letras")
+	@Pattern(regexp = "[a-z A-ZñáéíóúÑÁÉÍÓÚ]+", message="Los apellidos solo pueden estar formados por letras")
 	private String apellidos;
 	private Boolean espasajero;
 	private Boolean esconductor;
