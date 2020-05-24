@@ -469,10 +469,18 @@ public class Controlador {
  			String auxMatriculaVehiculo=param.get("matricula");
  			Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorMatricula(auxMatriculaVehiculo);
  	 		if(vOpt.isPresent()) {
- 	 			vOpt.get().setMarca(param.get("marca"));
- 	 			vOpt.get().setModelo(param.get("modelo"));
- 	 			vOpt.get().setCombustible(param.get("combustible"));
- 	 			vOpt.get().setColor(param.get("color"));
+ 	 			if(!param.get("marca").equals("")) {
+ 	 				vOpt.get().setMarca(param.get("marca"));
+ 	 			}
+ 	 			if(!param.get("modelo").equals("")) {
+ 	 				vOpt.get().setModelo(param.get("modelo"));
+ 	 			}
+ 	 			if(!param.get("combustible").equals("")) {
+ 	 				vOpt.get().setCombustible(param.get("combustible"));
+ 	 			}
+ 	 			if(!param.get("color").equals("")) {
+ 	 				vOpt.get().setColor(param.get("color"));
+ 	 			}
  	 			Vehiculo v=vOpt.get();
  	 			v = VehiculoServicio.actualizaVehiculo(v);
  	 			VehiculoConIgnore vI = new VehiculoConIgnore();
