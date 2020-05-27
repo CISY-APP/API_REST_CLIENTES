@@ -40,6 +40,7 @@ public class ViajeConIgnore implements java.io.Serializable{
 	private Date fechasalida;
 	private Date horasalida;
 	private Date fechacreacionviaje;
+	private String error;
 	private Set<Reserva> reservas = new HashSet<Reserva>(0);
 
 	public ViajeConIgnore() {
@@ -185,6 +186,14 @@ public class ViajeConIgnore implements java.io.Serializable{
 
 	public void setReservas(Set<Reserva> reservas) {
 		this.reservas = reservas;
+	}
+	
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
 	}
 
 }

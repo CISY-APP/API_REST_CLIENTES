@@ -267,6 +267,7 @@ public class Controlador {
 	public ResponseEntity<ViajeConIgnore> registraViaje(@RequestBody Map<String, String> param) {
  		Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
  		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+ 		ViajeConIgnore vError=new ViajeConIgnore();
  		if(uOpt.isPresent()) {
  			if(uOpt.get().getEsconductor()==true) {
  				String auxMatricula=param.get("matricula");
@@ -277,14 +278,17 @@ public class Controlador {
  	 					for(int i = 4 ; i < auxMatricula.length() && pruebaLetras ; i++ ) {
  	 						if(auxMatricula.charAt(i)<'A'||auxMatricula.charAt(i)>'Z') {
  	 							pruebaLetras=false;
- 	 							return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+ 	 							vError.setError("La matricula en el bloque de LETRAS contiene un caracter incorrecto");
+ 	 							return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.FORBIDDEN);	
  	 						}
  	 					}
  	 				}catch (NumberFormatException n){
- 	 					return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+ 	 					vError.setError("La matricula en el bloque de NUMEROS contiene un caracter incorrecto");
+ 	 					return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.FORBIDDEN);	
  	 				}
  	 			}else {
- 	 				return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
+ 	 				vError.setError("La matricula tiene una LONGITUD incorrecta");
+ 	 				return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.FORBIDDEN);	
  	 			}
  				Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorMatricula(auxMatricula);
  				if(vOpt.isPresent()) {
@@ -318,31 +322,95 @@ public class Controlador {
  	 	 				vI.setPrecio(v.getPrecio());
  	 	 				return new ResponseEntity<>(vI, HttpStatus.OK);
  	 				}else {
- 	 					return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+ 	 					vError.setError("El vehiculo no corresponde al usuario");
+ 	 					return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.BAD_REQUEST);
  	 				}
  					
  				}else {
- 					return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
+ 					vError.setError("El vehiculo no existe");
+ 					return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.NOT_FOUND);	
  				}
  				
  				
 			}else {
-				return new ResponseEntity<>(null,HttpStatus.CONFLICT);
+				vError.setError("El usuario no ha dado de alta ningún vehiculo");
+				return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.CONFLICT);
 			}
  		}else {
- 			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
+ 			vError.setError("El usuario no existe");
+ 			return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.NOT_FOUND);	
  		}
 	}
 	
 	
 	
 	//CONSULTAR VIAJE FILTRANDO
- 	@RequestMapping(value="/consultaViajesReservar/{origen}/{destino}/{fecha}/{hora}", method=RequestMethod.GET)
-	public ResponseEntity<List<Viaje>> consultaViajesReservar(@PathVariable("origen") String origen, @PathVariable("destino") String destino, @PathVariable("fecha") String fecha, @PathVariable("hora") String hora){
-		return new ResponseEntity<List<Viaje>>(ViajeServicio.consultaViajesReservar(origen, destino, fecha, hora),HttpStatus.OK);		
+ 	@RequestMapping(value="/consultaViajesReservar", method=RequestMethod.GET)
+	public ResponseEntity<List<ViajeConIgnore>> consultaViajesReservar(@RequestBody Map<String, String> param){
+ 		
+ 		if(!param.get("origen").equals(null) && !param.get("destino").equals(null) && !param.get("fechaSalida").equals(null) && param.get("horaSalida").equals(null)) {
+ 			String auxOrigen=param.get("origen");
+ 			String auxDestino=param.get("destino");
+ 			Date auxFechaSalida=Date.valueOf(param.get("fechaSalida"));
+ 			
+ 			List<Viaje> listaOriginal=ViajeServicio.muestraViajeSinHora(auxOrigen, auxDestino, auxFechaSalida);
+ 			List<ViajeConIgnore> listaIgnore=new ArrayList<ViajeConIgnore>();
+ 			
+ 			for(Viaje v: listaOriginal) {
+ 				
+ 				ViajeConIgnore vI = new ViajeConIgnore();
+ 		 		vI.setOrigen(v.getOrigen());
+ 				vI.setDestino(v.getDestino());
+ 				vI.setFechasalida(v.getFechasalida());
+ 				listaIgnore.add(vI);
+ 				
+ 			}
+ 			
+ 			return new ResponseEntity<List<ViajeConIgnore>>(listaIgnore,HttpStatus.OK);
+ 			
+ 			
+ 		}else if(!param.get("origen").equals(null) && !param.get("destino").equals(null) && !param.get("fechaSalida").equals(null) && !param.get("horaSalida").equals(null)) {
+ 			String auxOrigen=param.get("origen");
+ 			String auxDestino=param.get("destino");
+ 			Date auxFechaSalida=Date.valueOf(param.get("fechaSalida"));
+ 			Date auxHoraSalida=Date.valueOf(param.get("horaSalida"));
+ 			
+ 			List<Viaje> listaOriginal=ViajeServicio.muestraViajeConHora(auxOrigen, auxDestino, auxFechaSalida, auxHoraSalida);
+ 			List<ViajeConIgnore> listaIgnore=new ArrayList<ViajeConIgnore>();
+ 			
+ 			for(Viaje v: listaOriginal) {
+ 				
+ 				ViajeConIgnore vI = new ViajeConIgnore();
+ 		 		vI.setOrigen(v.getOrigen());
+ 				vI.setDestino(v.getDestino());
+ 				vI.setFechasalida(v.getFechasalida());
+ 				vI.setHorasalida(v.getHorasalida());
+ 				listaIgnore.add(vI);
+ 				
+ 			}
+ 			
+ 			return new ResponseEntity<List<ViajeConIgnore>>(listaIgnore,HttpStatus.OK);
+ 			
+ 		
+ 				
+ 		}else {
+ 			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+ 		}
+		
 	}
 	
- 	
+ 	//ELIMINAR VIAJE POR ID
+ 		@RequestMapping(value = "/eliminarViaje/{id}", method = RequestMethod.DELETE)//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
+ 		public ResponseEntity<Viaje> eliminarViaje(@PathVariable("id") Integer id) { //Metodo que elimina a un usuario por id
+ 		    Optional<Viaje> vOpt=ViajeServicio.muestraViajePorId(id);				//Comprobams si el usuario existe
+ 		    if (vOpt.isPresent()) {
+ 		    	Viaje v= vOpt.get();														//Si existe establecemos a un objeto usuario los valores 
+ 		    																				//asociados al id recibido
+ 		    	return new ResponseEntity<>(ViajeServicio.eliminaViaje(v),HttpStatus.OK);//Si existe eliminamos el usuario solicitado
+ 		    }else {	
+ 		    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);						//Si el usuario no existe devolvemos un código de error
+ 		    }
+ 		}
  	
  	
  // -------------------------------------------------------------INCIDENCIAS----------------------------------------------------------------------- //

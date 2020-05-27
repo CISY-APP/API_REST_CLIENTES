@@ -42,6 +42,7 @@ public class VehiculoServicio{
 		return VehiculoRepositorio.findBymatricula(matricula);
 		}
 	
+	
 	//Metodo para actualizar los datos del vehiculo
 	public Vehiculo actualizaVehiculo(Vehiculo v) {
 		return VehiculoRepositorio.save(v);
