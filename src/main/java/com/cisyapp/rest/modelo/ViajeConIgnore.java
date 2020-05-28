@@ -40,7 +40,9 @@ public class ViajeConIgnore implements java.io.Serializable{
 	private Date fechasalida;
 	private Date horasalida;
 	private Date fechacreacionviaje;
-	private String error;
+	private String matriculaError;
+	private String usuarioError;
+	private String vehiculoError;
 	private Set<Reserva> reservas = new HashSet<Reserva>(0);
 
 	public ViajeConIgnore() {
@@ -187,13 +189,30 @@ public class ViajeConIgnore implements java.io.Serializable{
 	public void setReservas(Set<Reserva> reservas) {
 		this.reservas = reservas;
 	}
-	
-	public String getError() {
-		return error;
+
+	public String getMatriculaError() {
+		return matriculaError;
 	}
 
-	public void setError(String error) {
-		this.error = error;
+	public void setMatriculaError(String matriculaError) {
+		this.matriculaError = matriculaError;
 	}
+
+	public String getUsuarioError() {
+		return usuarioError;
+	}
+
+	public void setUsuarioError(String usuarioError) {
+		this.usuarioError = usuarioError;
+	}
+
+	public String getVehiculoError() {
+		return vehiculoError;
+	}
+
+	public void setVehiculoError(String vehiculoError) {
+		this.vehiculoError = vehiculoError;
+	}
+	
 
 }

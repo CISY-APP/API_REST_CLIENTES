@@ -278,16 +278,16 @@ public class Controlador {
  	 					for(int i = 4 ; i < auxMatricula.length() && pruebaLetras ; i++ ) {
  	 						if(auxMatricula.charAt(i)<'A'||auxMatricula.charAt(i)>'Z') {
  	 							pruebaLetras=false;
- 	 							vError.setError("La matricula en el bloque de LETRAS contiene un caracter incorrecto");
+ 	 							vError.setMatriculaError("Caracter incorrecto en bloque de letras");
  	 							return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.FORBIDDEN);	
  	 						}
  	 					}
  	 				}catch (NumberFormatException n){
- 	 					vError.setError("La matricula en el bloque de NUMEROS contiene un caracter incorrecto");
+ 	 					vError.setMatriculaError("Caracter incorrecto en bloque de numeros");
  	 					return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.FORBIDDEN);	
  	 				}
  	 			}else {
- 	 				vError.setError("La matricula tiene una LONGITUD incorrecta");
+ 	 				vError.setMatriculaError("La matricula tiene una LONGITUD incorrecta");
  	 				return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.FORBIDDEN);	
  	 			}
  				Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorMatricula(auxMatricula);
@@ -298,7 +298,9 @@ public class Controlador {
  	 	 				int auxNumPlazas=Integer.parseInt(param.get("numPlazas"));
  	 	 				Date auxFecha=Date.valueOf(param.get("fecha"));
  	 	 				//Date auxHora=Date.valueOf(param.get("horaSalida"));
- 	 	 				Long precioAux=Long.valueOf(param.get("precio"));
+ 	 	 				//Long precioAux=Long.valueOf(param.get("precio"));
+ 	 	 				//BigDecimal auxPrecio=BigDecimal.valueOf(precioAux);
+ 	 	 				Double precioAux= Double.valueOf(param.get("precio"));
  	 	 				BigDecimal auxPrecio=BigDecimal.valueOf(precioAux);
  	 	 				Viaje v=new Viaje();
  	 	 				v.setUsuario(uOpt.get());
@@ -322,22 +324,22 @@ public class Controlador {
  	 	 				vI.setPrecio(v.getPrecio());
  	 	 				return new ResponseEntity<>(vI, HttpStatus.OK);
  	 				}else {
- 	 					vError.setError("El vehiculo no corresponde al usuario");
+ 	 					vError.setVehiculoError("El vehiculo no corresponde al usuario");
  	 					return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.BAD_REQUEST);
  	 				}
  					
  				}else {
- 					vError.setError("El vehiculo no existe");
+ 					vError.setVehiculoError("El vehiculo no existe");
  					return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.NOT_FOUND);	
  				}
  				
  				
 			}else {
-				vError.setError("El usuario no ha dado de alta ningún vehiculo");
+				vError.setUsuarioError("El usuario no ha dado de alta ningún vehiculo");
 				return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.CONFLICT);
 			}
  		}else {
- 			vError.setError("El usuario no existe");
+ 			vError.setUsuarioError("El usuario no existe");
  			return new ResponseEntity<ViajeConIgnore>(vError,HttpStatus.NOT_FOUND);	
  		}
 	}
@@ -369,7 +371,7 @@ public class Controlador {
  			return new ResponseEntity<List<ViajeConIgnore>>(listaIgnore,HttpStatus.OK);
  			
  			
- 		}else if(!param.get("origen").equals(null) && !param.get("destino").equals(null) && !param.get("fechaSalida").equals(null) && !param.get("horaSalida").equals(null)) {
+ 		}/*else if(!param.get("origen").equals(null) && !param.get("destino").equals(null) && !param.get("fechaSalida").equals(null) && !param.get("horaSalida").equals(null)) {
  			String auxOrigen=param.get("origen");
  			String auxDestino=param.get("destino");
  			Date auxFechaSalida=Date.valueOf(param.get("fechaSalida"));
@@ -393,7 +395,7 @@ public class Controlador {
  			
  		
  				
- 		}else {
+ 		}*/else {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
  		}
 		
