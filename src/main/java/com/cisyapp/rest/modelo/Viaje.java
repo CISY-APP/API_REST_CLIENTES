@@ -1,17 +1,15 @@
 package com.cisyapp.rest.modelo;
-// Generated 05-may-2020 17:39:03 by Hibernate Tools 5.2.12.Final
-
-import static javax.persistence.GenerationType.IDENTITY;
+// Generated 28-may-2020 20:41:23 by Hibernate Tools 5.2.12.Final
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -19,7 +17,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -29,7 +26,8 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "viaje", catalog = "cisy")
 public class Viaje implements java.io.Serializable {
-
+	
+	
 	private Integer idviaje;
 	@NotNull
 	private Usuario usuario;
@@ -37,46 +35,48 @@ public class Viaje implements java.io.Serializable {
 	private Vehiculo vehiculo;
 	@NotNull
 	@Size(min=3, max=30)
-	private String origen;
+	private String localidadorigen;
 	@NotNull
 	@Size(min=3, max=30)
-	private String destino;
-	private Integer codigoverificacion;
+	private String lugarsalida;
+	private String localidaddestino;
+	private String lugarllegada;
 	@NotNull
 	private BigDecimal precio;
 	@NotNull
 	private int numplazasdisponibles;
 	@NotNull
 	private Date fechasalida;
-	private Date horasalida;
 	private Date fechacreacionviaje;
 	private Set<Reserva> reservas = new HashSet<Reserva>(0);
 
 	public Viaje() {
 	}
 
-	public Viaje(Usuario usuario, Vehiculo vehiculo, String origen, String destino, int numplazasdisponibles,
-			Date fechacreacionviaje) {
+	public Viaje(Usuario usuario, Vehiculo vehiculo, String localidadorigen, String lugarsalida,
+			String localidaddestino, String lugarllegada, int numplazasdisponibles, Date fechacreacionviaje) {
 		this.usuario = usuario;
 		this.vehiculo = vehiculo;
-		this.origen = origen;
-		this.destino = destino;
+		this.localidadorigen = localidadorigen;
+		this.lugarsalida = lugarsalida;
+		this.localidaddestino = localidaddestino;
+		this.lugarllegada = lugarllegada;
 		this.numplazasdisponibles = numplazasdisponibles;
 		this.fechacreacionviaje = fechacreacionviaje;
 	}
 
-	public Viaje(Usuario usuario, Vehiculo vehiculo, String origen, String destino, Integer codigoverificacion,
-			BigDecimal precio, int numplazasdisponibles, Date fechasalida, Date horasalida, Date fechacreacionviaje,
-			Set<Reserva> reservas) {
+	public Viaje(Usuario usuario, Vehiculo vehiculo, String localidadorigen, String lugarsalida,
+			String localidaddestino, String lugarllegada, BigDecimal precio, int numplazasdisponibles, Date fechasalida,
+			Date fechacreacionviaje, Set<Reserva> reservas) {
 		this.usuario = usuario;
 		this.vehiculo = vehiculo;
-		this.origen = origen;
-		this.destino = destino;
-		this.codigoverificacion = codigoverificacion;
+		this.localidadorigen = localidadorigen;
+		this.lugarsalida = lugarsalida;
+		this.localidaddestino = localidaddestino;
+		this.lugarllegada = lugarllegada;
 		this.precio = precio;
 		this.numplazasdisponibles = numplazasdisponibles;
 		this.fechasalida = fechasalida;
-		this.horasalida = horasalida;
 		this.fechacreacionviaje = fechacreacionviaje;
 		this.reservas = reservas;
 	}
@@ -113,31 +113,40 @@ public class Viaje implements java.io.Serializable {
 		this.vehiculo = vehiculo;
 	}
 
-	@Column(name = "origen", nullable = false, length = 30)
-	public String getOrigen() {
-		return this.origen;
+	@Column(name = "localidadorigen", nullable = false, length = 30)
+	public String getLocalidadOrigen() {
+		return this.localidadorigen;
 	}
 
-	public void setOrigen(String origen) {
-		this.origen = origen;
+	public void setLocalidadOrigen(String localidadorigen) {
+		this.localidadorigen = localidadorigen;
 	}
 
-	@Column(name = "destino", nullable = false, length = 30)
-	public String getDestino() {
-		return this.destino;
+	@Column(name = "lugarsalida", nullable = false, length = 30)
+	public String getLugarSalida() {
+		return this.lugarsalida;
 	}
 
-	public void setDestino(String destino) {
-		this.destino = destino;
+	public void setLugarSalida(String lugarsalida) {
+		this.lugarsalida = lugarsalida;
 	}
 
-	@Column(name = "codigoverificacion")
-	public Integer getCodigoverificacion() {
-		return this.codigoverificacion;
+	@Column(name = "localidaddestino", nullable = false, length = 30)
+	public String getLocalidadDestino() {
+		return this.localidaddestino;
 	}
 
-	public void setCodigoverificacion(Integer codigoverificacion) {
-		this.codigoverificacion = codigoverificacion;
+	public void setLocalidadDestino(String localidaddestino) {
+		this.localidaddestino = localidaddestino;
+	}
+
+	@Column(name = "lugarllegada", nullable = false, length = 30)
+	public String getLugarLlegada() {
+		return this.lugarllegada;
+	}
+
+	public void setLugarLlegada(String lugarllegada) {
+		this.lugarllegada = lugarllegada;
 	}
 
 	@Column(name = "precio", precision = 4)
@@ -158,24 +167,14 @@ public class Viaje implements java.io.Serializable {
 		this.numplazasdisponibles = numplazasdisponibles;
 	}
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "fechasalida", length = 10)
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "fechasalida", length = 19)
 	public Date getFechasalida() {
 		return this.fechasalida;
 	}
 
 	public void setFechasalida(Date fechasalida) {
 		this.fechasalida = fechasalida;
-	}
-
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "horasalida", length = 19)
-	public Date getHorasalida() {
-		return this.horasalida;
-	}
-
-	public void setHorasalida(Date horasalida) {
-		this.horasalida = horasalida;
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)

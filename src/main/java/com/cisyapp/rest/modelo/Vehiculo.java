@@ -1,16 +1,14 @@
 package com.cisyapp.rest.modelo;
-// Generated 05-may-2020 17:39:03 by Hibernate Tools 5.2.12.Final
-
-import static javax.persistence.GenerationType.IDENTITY;
+// Generated 28-may-2020 20:41:23 by Hibernate Tools 5.2.12.Final
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -41,7 +39,6 @@ public class Vehiculo implements java.io.Serializable {
 	@NotNull
 	@Size(min=1, max=20)
 	private String combustible;
-	private Integer plazas;
 	@NotNull
 	@Size(min=1, max=30)
 	private String marca;
@@ -58,14 +55,13 @@ public class Vehiculo implements java.io.Serializable {
 		this.fechadealta = fechadealta;
 	}
 
-	public Vehiculo(Usuario usuario, String matricula, String modelo, String color, String combustible, Integer plazas,
-			String marca, String fotovehiculo, Date fechadealta, Set<Viaje> viajes) {
+	public Vehiculo(Usuario usuario, String matricula, String modelo, String color, String combustible, String marca,
+			String fotovehiculo, Date fechadealta, Set<Viaje> viajes) {
 		this.usuario = usuario;
 		this.matricula = matricula;
 		this.modelo = modelo;
 		this.color = color;
 		this.combustible = combustible;
-		this.plazas = plazas;
 		this.marca = marca;
 		this.fotovehiculo = fotovehiculo;
 		this.fechadealta = fechadealta;
@@ -130,15 +126,6 @@ public class Vehiculo implements java.io.Serializable {
 		this.combustible = combustible;
 	}
 
-	@Column(name = "plazas")
-	public Integer getPlazas() {
-		return this.plazas;
-	}
-
-	public void setPlazas(Integer plazas) {
-		this.plazas = plazas;
-	}
-
 	@Column(name = "marca", length = 30)
 	public String getMarca() {
 		return this.marca;
@@ -148,7 +135,7 @@ public class Vehiculo implements java.io.Serializable {
 		this.marca = marca;
 	}
 
-	@Column(name = "fotovehiculo", length = 99)
+	@Column(name = "fotovehiculo", length = 500)
 	public String getFotovehiculo() {
 		return this.fotovehiculo;
 	}

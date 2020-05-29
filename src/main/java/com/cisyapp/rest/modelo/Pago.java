@@ -1,8 +1,8 @@
 package com.cisyapp.rest.modelo;
-// Generated 05-may-2020 17:39:03 by Hibernate Tools 5.2.12.Final
+// Generated 28-may-2020 20:41:23 by Hibernate Tools 5.2.12.Final
 
+import java.math.BigDecimal;
 import java.util.Date;
-
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -25,7 +25,7 @@ public class Pago implements java.io.Serializable {
 	private PagoId id;
 	private Usuario usuarioByIdusuarioconductor;
 	private Usuario usuarioByIdusuariopasajero;
-	private Integer cantidad;
+	private BigDecimal cantidad;
 	private Date fechapago;
 
 	public Pago() {
@@ -38,7 +38,7 @@ public class Pago implements java.io.Serializable {
 		this.fechapago = fechapago;
 	}
 
-	public Pago(PagoId id, Usuario usuarioByIdusuarioconductor, Usuario usuarioByIdusuariopasajero, Integer cantidad,
+	public Pago(PagoId id, Usuario usuarioByIdusuarioconductor, Usuario usuarioByIdusuariopasajero, BigDecimal cantidad,
 			Date fechapago) {
 		this.id = id;
 		this.usuarioByIdusuarioconductor = usuarioByIdusuarioconductor;
@@ -80,12 +80,12 @@ public class Pago implements java.io.Serializable {
 		this.usuarioByIdusuariopasajero = usuarioByIdusuariopasajero;
 	}
 
-	@Column(name = "cantidad")
-	public Integer getCantidad() {
+	@Column(name = "cantidad", precision = 4)
+	public BigDecimal getCantidad() {
 		return this.cantidad;
 	}
 
-	public void setCantidad(Integer cantidad) {
+	public void setCantidad(BigDecimal cantidad) {
 		this.cantidad = cantidad;
 	}
 

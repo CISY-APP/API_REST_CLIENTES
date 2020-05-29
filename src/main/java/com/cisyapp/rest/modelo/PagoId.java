@@ -1,5 +1,5 @@
 package com.cisyapp.rest.modelo;
-// Generated 05-may-2020 17:39:03 by Hibernate Tools 5.2.12.Final
+// Generated 28-may-2020 20:41:23 by Hibernate Tools 5.2.12.Final
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

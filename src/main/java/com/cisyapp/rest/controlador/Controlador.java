@@ -3,11 +3,15 @@ package com.cisyapp.rest.controlador;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +20,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.cisyapp.rest.clasesaux.UsuarioConIgnore;
+import com.cisyapp.rest.clasesaux.VehiculoConIgnore;
+import com.cisyapp.rest.clasesaux.ViajeConIgnore;
 import com.cisyapp.rest.modelo.Usuario;
-import com.cisyapp.rest.modelo.UsuarioConIgnore;
 import com.cisyapp.rest.modelo.Vehiculo;
-import com.cisyapp.rest.modelo.VehiculoConIgnore;
 import com.cisyapp.rest.modelo.Viaje;
-import com.cisyapp.rest.modelo.ViajeConIgnore;
-import com.cisyapp.rest.servicio.IncidenciaServicio;
 import com.cisyapp.rest.servicio.UsuarioServicio;
 import com.cisyapp.rest.servicio.VehiculoServicio;
 import com.cisyapp.rest.servicio.ViajeServicio;
@@ -37,12 +41,9 @@ public class Controlador {
 	private ViajeServicio ViajeServicio;
 	
 	@Autowired
-	private IncidenciaServicio IncidenciaServicio;
-	
-	@Autowired
 	private VehiculoServicio VehiculoServicio;
 
-	
+
 	
 	// -------------------------------------------------------------USUARIOS----------------------------------------------------------------------- //
 	
@@ -85,14 +86,25 @@ public class Controlador {
 				Usuario u= uOpt.get();
 				//Creamos un usuario con jsonignore
 				UsuarioConIgnore uI = new UsuarioConIgnore();
-				uI.setApellidos(u.getApellidos());uI.setClave(u.getClave());uI.setDescripcion(u.getDescripcion());
-				uI.setDoblefactoractivado(u.getDoblefactoractivado());uI.setEmail(u.getEmail());uI.setEmailverificado(u.getEmailverificado());
-				uI.setEsconductor(u.getEsconductor());uI.setEspasajero(u.getEspasajero());uI.setFechadesconexion(u.getFechadesconexion());
-				uI.setFechanacimiento(u.getFechanacimiento());uI.setFecharegistro(u.getFecharegistro());uI.setFotokyc(u.getFotokyc());
-				uI.setFotousuario(u.getFotousuario());uI.setIdusuario(u.getIdusuario());uI.setIncidencias(u.getIncidencias());
-				uI.setNombre(u.getNombre());uI.setPagosForIdusuarioconductor(u.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(u.getPagosForIdusuariopasajero());
-				uI.setReservas(u.getReservas());uI.setSesioniniciada(u.getSesioniniciada());uI.setTelefono(u.getTelefono());
-				uI.setTelefonoverificado(u.getTelefonoverificado());uI.setValoracion(u.getValoracion());uI.setVehiculos(u.getVehiculos());uI.setViajes(u.getViajes());
+				uI.setApellidos(u.getApellidos());
+				uI.setClave(u.getClave());
+				uI.setDescripcion(u.getDescripcion());
+				uI.setEmail(u.getEmail());
+				uI.setEsconductor(u.getEsconductor());
+				uI.setEspasajero(u.getEspasajero());
+				uI.setFechadesconexion(u.getFechadesconexion());
+				uI.setFechanacimiento(u.getFechanacimiento());
+				uI.setFecharegistro(u.getFecharegistro());
+				uI.setFotousuario(u.getFotousuario());
+				uI.setIdusuario(u.getIdusuario());
+				uI.setNombre(u.getNombre());
+				uI.setPagosForIdusuarioconductor(u.getPagosForIdusuarioconductor());
+				uI.setPagosForIdusuariopasajero(u.getPagosForIdusuariopasajero());
+				uI.setReservas(u.getReservas());
+				uI.setSesioniniciada(u.getSesioniniciada());
+				uI.setTelefono(u.getTelefono());
+				uI.setVehiculos(u.getVehiculos());
+				uI.setViajes(u.getViajes());
 		    	return new ResponseEntity<UsuarioConIgnore>(uI,HttpStatus.OK);//Si existe el usuario y la clave es correcta devolvemos el usuario
 	    	}else {
 	    		return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);
@@ -112,14 +124,25 @@ public class Controlador {
  			Usuario u=uOpt.get();									//Si el usuario existe, lo devolvemos
  																	
 			UsuarioConIgnore uI = new UsuarioConIgnore();	//Creamos un usuario con jsonignore
-			uI.setApellidos(u.getApellidos());uI.setClave(u.getClave());uI.setDescripcion(u.getDescripcion());
-			uI.setDoblefactoractivado(u.getDoblefactoractivado());uI.setEmail(u.getEmail());uI.setEmailverificado(u.getEmailverificado());
-			uI.setEsconductor(u.getEsconductor());uI.setEspasajero(u.getEspasajero());uI.setFechadesconexion(u.getFechadesconexion());
-			uI.setFechanacimiento(u.getFechanacimiento());uI.setFecharegistro(u.getFecharegistro());uI.setFotokyc(u.getFotokyc());
-			uI.setFotousuario(u.getFotousuario());uI.setIdusuario(u.getIdusuario());uI.setIncidencias(u.getIncidencias());
-			uI.setNombre(u.getNombre());uI.setPagosForIdusuarioconductor(u.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(u.getPagosForIdusuariopasajero());
-			uI.setReservas(u.getReservas());uI.setSesioniniciada(u.getSesioniniciada());uI.setTelefono(u.getTelefono());
-			uI.setTelefonoverificado(u.getTelefonoverificado());uI.setValoracion(u.getValoracion());uI.setVehiculos(u.getVehiculos());uI.setViajes(u.getViajes());
+			uI.setApellidos(u.getApellidos());
+			uI.setClave(u.getClave());
+			uI.setDescripcion(u.getDescripcion());
+			uI.setEmail(u.getEmail());
+			uI.setEsconductor(u.getEsconductor());
+			uI.setEspasajero(u.getEspasajero());
+			uI.setFechadesconexion(u.getFechadesconexion());
+			uI.setFechanacimiento(u.getFechanacimiento());
+			uI.setFecharegistro(u.getFecharegistro());
+			uI.setFotousuario(u.getFotousuario());
+			uI.setIdusuario(u.getIdusuario());
+			uI.setNombre(u.getNombre());
+			uI.setPagosForIdusuarioconductor(u.getPagosForIdusuarioconductor());
+			uI.setPagosForIdusuariopasajero(u.getPagosForIdusuariopasajero());
+			uI.setReservas(u.getReservas());
+			uI.setSesioniniciada(u.getSesioniniciada());
+			uI.setTelefono(u.getTelefono());
+			uI.setVehiculos(u.getVehiculos());
+			uI.setViajes(u.getViajes());
  			return new ResponseEntity<UsuarioConIgnore>(uI, HttpStatus.OK);
  		}else {														//Si el usuario NO existe devolvemos un código de error
  			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -156,14 +179,25 @@ public class Controlador {
 	 		Usuario uA = UsuarioServicio.actualizaUsuario(u);
 	 		//Creamos un usuario con jsonignore
 			UsuarioConIgnore uI = new UsuarioConIgnore();
-			uI.setApellidos(uA.getApellidos());uI.setClave(uA.getClave());uI.setDescripcion(uA.getDescripcion());
-			uI.setDoblefactoractivado(uA.getDoblefactoractivado());uI.setEmail(uA.getEmail());uI.setEmailverificado(uA.getEmailverificado());
-			uI.setEsconductor(uA.getEsconductor());uI.setEspasajero(uA.getEspasajero());uI.setFechadesconexion(uA.getFechadesconexion());
-			uI.setFechanacimiento(uA.getFechanacimiento());uI.setFecharegistro(uA.getFecharegistro());uI.setFotokyc(uA.getFotokyc());
-			uI.setFotousuario(uA.getFotousuario());uI.setIdusuario(uA.getIdusuario());uI.setIncidencias(uA.getIncidencias());
-			uI.setNombre(uA.getNombre());uI.setPagosForIdusuarioconductor(uA.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(uA.getPagosForIdusuariopasajero());
-			uI.setReservas(uA.getReservas());uI.setSesioniniciada(uA.getSesioniniciada());uI.setTelefono(uA.getTelefono());
-			uI.setTelefonoverificado(uA.getTelefonoverificado());uI.setValoracion(uA.getValoracion());uI.setVehiculos(uA.getVehiculos());uI.setViajes(uA.getViajes());
+			uI.setApellidos(uA.getApellidos());
+			uI.setClave(uA.getClave());
+			uI.setDescripcion(uA.getDescripcion());
+			uI.setEmail(uA.getEmail());
+			uI.setEsconductor(uA.getEsconductor());
+			uI.setEspasajero(uA.getEspasajero());
+			uI.setFechadesconexion(uA.getFechadesconexion());
+			uI.setFechanacimiento(uA.getFechanacimiento());
+			uI.setFecharegistro(uA.getFecharegistro());
+			uI.setFotousuario(uA.getFotousuario());
+			uI.setIdusuario(uA.getIdusuario());
+			uI.setNombre(uA.getNombre());
+			uI.setPagosForIdusuarioconductor(uA.getPagosForIdusuarioconductor());
+			uI.setPagosForIdusuariopasajero(uA.getPagosForIdusuariopasajero());
+			uI.setReservas(uA.getReservas());
+			uI.setSesioniniciada(uA.getSesioniniciada());
+			uI.setTelefono(uA.getTelefono());
+			uI.setVehiculos(uA.getVehiculos());
+			uI.setViajes(uA.getViajes());
 	 		return ResponseEntity.ok(uI);			//Llamamos al metodo encargado de actualizar los datos
 	 	}else {
 	 		return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);				//Si el usuario no existe devolvemos un código de error
@@ -202,14 +236,25 @@ public class Controlador {
 	 		 		
 	 		 		
 	 				UsuarioConIgnore uI = new UsuarioConIgnore();	//Creamos un usuario con jsonignore
-	 				uI.setApellidos(u.getApellidos());uI.setClave(u.getClave());uI.setDescripcion(u.getDescripcion());
-	 				uI.setDoblefactoractivado(u.getDoblefactoractivado());uI.setEmail(u.getEmail());uI.setEmailverificado(u.getEmailverificado());
-	 				uI.setEsconductor(u.getEsconductor());uI.setEspasajero(u.getEspasajero());uI.setFechadesconexion(u.getFechadesconexion());
-	 				uI.setFechanacimiento(u.getFechanacimiento());uI.setFecharegistro(u.getFecharegistro());uI.setFotokyc(u.getFotokyc());
-	 				uI.setFotousuario(u.getFotousuario());uI.setIdusuario(u.getIdusuario());uI.setIncidencias(u.getIncidencias());
-	 				uI.setNombre(u.getNombre());uI.setPagosForIdusuarioconductor(u.getPagosForIdusuarioconductor());uI.setPagosForIdusuariopasajero(u.getPagosForIdusuariopasajero());
-	 				uI.setReservas(u.getReservas());uI.setSesioniniciada(u.getSesioniniciada());uI.setTelefono(u.getTelefono());
-	 				uI.setTelefonoverificado(u.getTelefonoverificado());uI.setValoracion(u.getValoracion());uI.setVehiculos(u.getVehiculos());uI.setViajes(u.getViajes());
+	 				uI.setApellidos(u.getApellidos());
+	 				uI.setClave(u.getClave());
+	 				uI.setDescripcion(u.getDescripcion());
+	 				uI.setEmail(u.getEmail());
+	 				uI.setEsconductor(u.getEsconductor());
+	 				uI.setEspasajero(u.getEspasajero());
+	 				uI.setFechadesconexion(u.getFechadesconexion());
+	 				uI.setFechanacimiento(u.getFechanacimiento());
+	 				uI.setFecharegistro(u.getFecharegistro());
+	 				uI.setFotousuario(u.getFotousuario());
+	 				uI.setIdusuario(u.getIdusuario());
+	 				uI.setNombre(u.getNombre());
+	 				uI.setPagosForIdusuarioconductor(u.getPagosForIdusuarioconductor());
+	 				uI.setPagosForIdusuariopasajero(u.getPagosForIdusuariopasajero());
+	 				uI.setReservas(u.getReservas());
+	 				uI.setSesioniniciada(u.getSesioniniciada());
+	 				uI.setTelefono(u.getTelefono());
+	 				uI.setVehiculos(u.getVehiculos());
+	 				uI.setViajes(u.getViajes());
 		 			return ResponseEntity.ok(uI);	//Llamamos al metodo encargado de actualizar los datos
 	 			}else {
 	 				return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);		//Si falla alguna comprobación devolvemos un codigo de error
@@ -293,34 +338,41 @@ public class Controlador {
  				Optional<Vehiculo>vOpt=VehiculoServicio.consultaVehiculoPorMatricula(auxMatricula);
  				if(vOpt.isPresent()) {
  					if(vOpt.get().getUsuario().getIdusuario()==auxIdUsuario) {
- 	 					String auxOrigen=param.get("origen");
- 	 	 				String auxDestino=param.get("destino");
+ 	 					String auxLocalidadOrigen=param.get("localidadOrigen");
+ 	 					String auxLugarSalida=param.get("lugarSalida");
+ 	 	 				String auxLocalidadDestino=param.get("localidadDestino");
+ 	 	 				String auxLugarLlegada=param.get("lugarLlegada");
  	 	 				int auxNumPlazas=Integer.parseInt(param.get("numPlazas"));
- 	 	 				Date auxFecha=Date.valueOf(param.get("fecha"));
- 	 	 				//Date auxHora=Date.valueOf(param.get("horaSalida"));
- 	 	 				//Long precioAux=Long.valueOf(param.get("precio"));
- 	 	 				//BigDecimal auxPrecio=BigDecimal.valueOf(precioAux);
+ 	 	 				SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+ 	 	 				java.util.Date auxFecha=null;
+						try {
+							auxFecha = form.parse(param.get("fecha"));
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
  	 	 				Double precioAux= Double.valueOf(param.get("precio"));
  	 	 				BigDecimal auxPrecio=BigDecimal.valueOf(precioAux);
  	 	 				Viaje v=new Viaje();
  	 	 				v.setUsuario(uOpt.get());
  	 	 				v.setVehiculo(vOpt.get());
- 	 	 				v.setOrigen(auxOrigen);
- 	 	 				v.setDestino(auxDestino);
+ 	 	 				v.setLocalidadOrigen(auxLocalidadOrigen);
+ 	 	 				v.setLugarSalida(auxLugarSalida);
+ 	 	 				v.setLocalidadDestino(auxLocalidadDestino);
+ 	 	 				v.setLugarLlegada(auxLugarLlegada);
  	 	 				v.setNumplazasdisponibles(auxNumPlazas);
  	 	 				v.setFechasalida(auxFecha);
- 	 	 				//v.setHorasalida(auxHora);
  	 	 				v.setPrecio(auxPrecio);
  	 	 				ViajeServicio.registraViaje(v);
  	 	 				
  	 	 				ViajeConIgnore vI=new ViajeConIgnore();
  	 	 				vI.setUsuario(v.getUsuario());
  	 	 				vI.setVehiculo(v.getVehiculo());
- 	 	 				vI.setOrigen(v.getOrigen());
- 	 	 				vI.setDestino(v.getDestino());
+ 	 	 				vI.setLocalidadOrigen(v.getLocalidadOrigen());
+ 	 	 				vI.setLugarSalida(v.getLugarSalida());
+ 	 	 				vI.setLocalidadDestino(v.getLocalidadDestino());
+ 	 	 				vI.setLugarLlegada(v.getLugarLlegada());
  	 	 				vI.setNumplazasdisponibles(v.getNumplazasdisponibles());
  	 	 				vI.setFechasalida(v.getFechasalida());
- 	 	 				//vI.setHorasalida(v.getHorasalida());
  	 	 				vI.setPrecio(v.getPrecio());
  	 	 				return new ResponseEntity<>(vI, HttpStatus.OK);
  	 				}else {
@@ -350,19 +402,23 @@ public class Controlador {
  	@RequestMapping(value="/consultaViajesReservar", method=RequestMethod.GET)
 	public ResponseEntity<List<ViajeConIgnore>> consultaViajesReservar(@RequestBody Map<String, String> param){
  		
- 		if(!param.get("origen").equals(null) && !param.get("destino").equals(null) && !param.get("fechaSalida").equals(null) && param.get("horaSalida").equals(null)) {
- 			String auxOrigen=param.get("origen");
- 			String auxDestino=param.get("destino");
+ 		if(!param.get("localidadOrigen").equals(null) && !param.get("lugarSalida").equals(null) && !param.get("localidadDestino").equals(null) && !param.get("lugarLlegada").equals(null) && !param.get("fechaSalida").equals(null) && param.get("horaSalida").equals(null)) {
+ 			String auxLocalidadOrigen=param.get("localidadOrigen");
+ 			String auxLugarSalida=param.get("lugarSalida");
+ 			String auxLocalidadDestino=param.get("localidadDestino");
+ 			String auxLugarLlegada=param.get("lugarLlegada");
  			Date auxFechaSalida=Date.valueOf(param.get("fechaSalida"));
  			
- 			List<Viaje> listaOriginal=ViajeServicio.muestraViajeSinHora(auxOrigen, auxDestino, auxFechaSalida);
+ 			List<Viaje> listaOriginal=ViajeServicio.muestraViajeSinHora(auxLocalidadOrigen, auxLocalidadDestino, auxFechaSalida);
  			List<ViajeConIgnore> listaIgnore=new ArrayList<ViajeConIgnore>();
  			
  			for(Viaje v: listaOriginal) {
  				
  				ViajeConIgnore vI = new ViajeConIgnore();
- 		 		vI.setOrigen(v.getOrigen());
- 				vI.setDestino(v.getDestino());
+ 		 		vI.setLocalidadOrigen(v.getLocalidadOrigen());
+ 		 		vI.setLugarSalida(v.getLugarSalida());
+ 				vI.setLocalidadDestino(v.getLocalidadDestino());
+ 				vI.setLugarLlegada(v.getLugarLlegada());
  				vI.setFechasalida(v.getFechasalida());
  				listaIgnore.add(vI);
  				
@@ -460,10 +516,16 @@ public class Controlador {
 			Vehiculo vR = VehiculoServicio.registraVehiculo(v);
 	 		//Creamos un vehiculo con jsonignore
 			VehiculoConIgnore vI = new VehiculoConIgnore();
-			vI.setColor(vR.getColor());vI.setCombustible(vR.getCombustible());vI.setFechadealta(vR.getFechadealta());
-			vI.setFotovehiculo(vR.getFotovehiculo());vI.setIdvehiculo(vR.getIdvehiculo());vI.setMarca(vR.getMarca());
-			vI.setMatricula(vR.getMatricula());vI.setModelo(vR.getModelo());vI.setPlazas(vR.getPlazas());
-			vI.setUsuario(vR.getUsuario());vI.setViajes(vR.getViajes());
+			vI.setColor(vR.getColor());
+			vI.setCombustible(vR.getCombustible());
+			vI.setFechadealta(vR.getFechadealta());
+			vI.setFotovehiculo(vR.getFotovehiculo());
+			vI.setIdvehiculo(vR.getIdvehiculo());
+			vI.setMarca(vR.getMarca());
+			vI.setMatricula(vR.getMatricula());
+			vI.setModelo(vR.getModelo());
+			vI.setUsuario(vR.getUsuario());
+			vI.setViajes(vR.getViajes());
  			return new ResponseEntity<>(vI, HttpStatus.OK);
  		}else {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
@@ -480,10 +542,16 @@ public class Controlador {
  		 	List<VehiculoConIgnore> listaAuxiliar = new ArrayList<VehiculoConIgnore>();
  		 	for (Vehiculo vl : listaOriginal) {
  		 		VehiculoConIgnore v = new VehiculoConIgnore();
- 		 		v.setColor(vl.getColor());v.setCombustible(vl.getCombustible());v.setFechadealta(vl.getFechadealta());
- 				v.setFotovehiculo(vl.getFotovehiculo());v.setIdvehiculo(vl.getIdvehiculo());v.setMarca(vl.getMarca());
- 				v.setMatricula(vl.getMatricula());v.setModelo(vl.getModelo());v.setPlazas(vl.getPlazas());
- 				v.setUsuario(vl.getUsuario());v.setViajes(vl.getViajes());
+ 		 		v.setColor(vl.getColor());
+ 		 		v.setCombustible(vl.getCombustible());
+ 		 		v.setFechadealta(vl.getFechadealta());
+ 				v.setFotovehiculo(vl.getFotovehiculo());
+ 				v.setIdvehiculo(vl.getIdvehiculo());
+ 				v.setMarca(vl.getMarca());
+ 				v.setMatricula(vl.getMatricula());
+ 				v.setModelo(vl.getModelo());
+ 				v.setUsuario(vl.getUsuario());
+ 				v.setViajes(vl.getViajes());
 				listaAuxiliar.add(v);
  			}
  			return new ResponseEntity<List<VehiculoConIgnore>>(listaAuxiliar, HttpStatus.OK);
@@ -554,10 +622,16 @@ public class Controlador {
  	 			Vehiculo v=vOpt.get();
  	 			v = VehiculoServicio.actualizaVehiculo(v);
  	 			VehiculoConIgnore vI = new VehiculoConIgnore();
- 		 		vI.setColor(v.getColor());vI.setCombustible(v.getCombustible());vI.setFechadealta(v.getFechadealta());
- 				vI.setFotovehiculo(v.getFotovehiculo());vI.setIdvehiculo(v.getIdvehiculo());vI.setMarca(v.getMarca());
- 				vI.setMatricula(v.getMatricula());vI.setModelo(v.getModelo());vI.setPlazas(v.getPlazas());
- 				vI.setUsuario(v.getUsuario());vI.setViajes(v.getViajes());
+ 		 		vI.setColor(v.getColor());
+ 		 		vI.setCombustible(v.getCombustible());
+ 		 		vI.setFechadealta(v.getFechadealta());
+ 				vI.setFotovehiculo(v.getFotovehiculo());
+ 				vI.setIdvehiculo(v.getIdvehiculo());
+ 				vI.setMarca(v.getMarca());
+ 				vI.setMatricula(v.getMatricula());
+ 				vI.setModelo(v.getModelo());
+ 				vI.setUsuario(v.getUsuario());
+ 				vI.setViajes(v.getViajes());
  	 			return ResponseEntity.ok(vI);
  	 		}else {
  	 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);

@@ -1,8 +1,7 @@
 package com.cisyapp.rest.modelo;
-// Generated 05-may-2020 17:39:03 by Hibernate Tools 5.2.12.Final
+// Generated 28-may-2020 20:41:23 by Hibernate Tools 5.2.12.Final
 
 import java.util.Date;
-
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
@@ -26,17 +25,15 @@ public class Reserva implements java.io.Serializable {
 	private Usuario usuario;
 	private Viaje viaje;
 	private Date fechareserva;
-	private Date horafichaje;
 
 	public Reserva() {
 	}
 
-	public Reserva(ReservaId id, Usuario usuario, Viaje viaje, Date fechareserva, Date horafichaje) {
+	public Reserva(ReservaId id, Usuario usuario, Viaje viaje, Date fechareserva) {
 		this.id = id;
 		this.usuario = usuario;
 		this.viaje = viaje;
 		this.fechareserva = fechareserva;
-		this.horafichaje = horafichaje;
 	}
 
 	@EmbeddedId
@@ -81,16 +78,6 @@ public class Reserva implements java.io.Serializable {
 
 	public void setFechareserva(Date fechareserva) {
 		this.fechareserva = fechareserva;
-	}
-
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "horafichaje", nullable = false, length = 19)
-	public Date getHorafichaje() {
-		return this.horafichaje;
-	}
-
-	public void setHorafichaje(Date horafichaje) {
-		this.horafichaje = horafichaje;
 	}
 
 }
