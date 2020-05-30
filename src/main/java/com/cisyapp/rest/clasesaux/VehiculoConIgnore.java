@@ -136,7 +136,7 @@ public class VehiculoConIgnore implements java.io.Serializable {
 	public void setFechadealta(Date fechadealta) {
 		this.fechadealta = fechadealta;
 	}
-
+	@JsonIgnore
 	public Set<Viaje> getViajes() {
 		return this.viajes;
 	}

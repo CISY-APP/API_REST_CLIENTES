@@ -87,7 +87,6 @@ public class UsuarioConIgnore implements java.io.Serializable {
 		this.pagosForIdusuariopasajero = pagosForIdusuariopasajero;
 	}
 
-
 	public Integer getIdusuario() {
 		return this.idusuario;
 	}
@@ -199,7 +198,7 @@ public class UsuarioConIgnore implements java.io.Serializable {
 	public void setSesioniniciada(Boolean sesioniniciada) {
 		this.sesioniniciada = sesioniniciada;
 	}
-
+	@JsonIgnore
 	public Set<Vehiculo> getVehiculos() {
 		return this.vehiculos;
 	}
@@ -207,7 +206,7 @@ public class UsuarioConIgnore implements java.io.Serializable {
 	public void setVehiculos(Set<Vehiculo> vehiculos) {
 		this.vehiculos = vehiculos;
 	}
-
+	@JsonIgnore
 	public Set<Reserva> getReservas() {
 		return this.reservas;
 	}
@@ -215,7 +214,7 @@ public class UsuarioConIgnore implements java.io.Serializable {
 	public void setReservas(Set<Reserva> reservas) {
 		this.reservas = reservas;
 	}
-
+	@JsonIgnore
 	public Set<Viaje> getViajes() {
 		return this.viajes;
 	}
@@ -223,7 +222,7 @@ public class UsuarioConIgnore implements java.io.Serializable {
 	public void setViajes(Set<Viaje> viajes) {
 		this.viajes = viajes;
 	}
-
+	@JsonIgnore
 	public Set<Pago> getPagosForIdusuarioconductor() {
 		return this.pagosForIdusuarioconductor;
 	}
@@ -231,7 +230,7 @@ public class UsuarioConIgnore implements java.io.Serializable {
 	public void setPagosForIdusuarioconductor(Set<Pago> pagosForIdusuarioconductor) {
 		this.pagosForIdusuarioconductor = pagosForIdusuarioconductor;
 	}
-
+	@JsonIgnore
 	public Set<Pago> getPagosForIdusuariopasajero() {
 		return this.pagosForIdusuariopasajero;
 	}

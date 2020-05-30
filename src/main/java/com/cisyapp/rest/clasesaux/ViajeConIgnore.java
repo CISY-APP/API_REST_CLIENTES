@@ -152,7 +152,7 @@ public class ViajeConIgnore implements java.io.Serializable{
 	public void setFechacreacionviaje(Date fechacreacionviaje) {
 		this.fechacreacionviaje = fechacreacionviaje;
 	}
-
+	@JsonIgnore
 	public Set<Reserva> getReservas() {
 		return this.reservas;
 	}
