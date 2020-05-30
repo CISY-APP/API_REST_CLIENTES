@@ -34,10 +34,10 @@ public class Viaje implements java.io.Serializable {
 	@NotNull
 	private Vehiculo vehiculo;
 	@NotNull
-	@Size(min=3, max=30)
+	@Size(min=1, max=30)
 	private String localidadorigen;
 	@NotNull
-	@Size(min=3, max=30)
+	@Size(min=1, max=30)
 	private String lugarsalida;
 	private String localidaddestino;
 	private String lugarllegada;
