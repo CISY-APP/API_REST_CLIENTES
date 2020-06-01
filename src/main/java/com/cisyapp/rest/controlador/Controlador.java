@@ -472,6 +472,7 @@ public class Controlador {
  			v.setModelo(param.get("modelo"));
  			v.setCombustible(param.get("combustible"));
  			v.setColor(param.get("color"));
+ 			v.setFotovehiculo(param.get("fotovehiculo"));
  			Usuario u=uOpt.get();
  			u.setEsconductor(true);
 			UsuarioServicio.actualizaUsuario(u);
@@ -578,6 +579,9 @@ public class Controlador {
  	 			}
  	 			if(!param.get("color").equals("")) {
  	 				vOpt.get().setColor(param.get("color"));
+ 	 			}
+ 	 			if(!param.get("fotovehiculo").equals("")) {
+ 	 				vOpt.get().setFotovehiculo(param.get("fotovehiculo"));
  	 			}
  	 			Vehiculo v=vOpt.get();
  	 			v = VehiculoServicio.actualizaVehiculo(v);
