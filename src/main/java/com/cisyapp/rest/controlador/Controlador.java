@@ -176,7 +176,11 @@ public class Controlador {
 	 		if(!param.get("descripcion").equals("") && !(param.get("descripcion").length()>300)) {								//Comprobamos que el altributo descripción tiene contenido
 	 			u.setDescripcion(param.get("descripcion"));							//si tiene contenido establecemos la nueva descripción
 	 		}
+	 		if(!param.get("fotousuario").equals("")) {								//Comprobamos que el altributo descripción tiene contenido
+	 			u.setFotousuario(param.get("fotousuario"));							//si tiene contenido establecemos la nueva descripción
+	 		}
 	 		Usuario uA = UsuarioServicio.actualizaUsuario(u);
+	 		
 	 		//Creamos un usuario con jsonignore
 			UsuarioConIgnore uI = new UsuarioConIgnore();
 			uI.setApellidos(uA.getApellidos());
