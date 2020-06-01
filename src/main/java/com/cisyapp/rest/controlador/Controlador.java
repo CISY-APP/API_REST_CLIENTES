@@ -30,6 +30,7 @@ import com.cisyapp.rest.modelo.Viaje;
 import com.cisyapp.rest.servicio.UsuarioServicio;
 import com.cisyapp.rest.servicio.VehiculoServicio;
 import com.cisyapp.rest.servicio.ViajeServicio;
+import com.cisyapp.rest.controlador.Biblioteca;
 
 @Controller
 public class Controlador {
@@ -42,11 +43,8 @@ public class Controlador {
 	
 	@Autowired
 	private VehiculoServicio VehiculoServicio;
-
-
 	
 	// -------------------------------------------------------------USUARIOS----------------------------------------------------------------------- //
-	
 	//REGISTRO USUARIOS 
 	@RequestMapping(value = "/registrarUsuario", method = RequestMethod.POST) //Definimos la URI a la que nos deben enviar las peticiones y el metodo http
 	public ResponseEntity<Usuario> registraUsuario(@Valid @RequestBody Usuario usuario) { //Metodo que devuelve una entidad Usuario y recibe mediante el
@@ -115,8 +113,7 @@ public class Controlador {
 	}
 	
 	//MOSTRAR USUARIO POR ID
-	@RequestMapping(value = "/consultarUsuarioPorId/{id}", method = RequestMethod.GET)//Definimos la URI a la que nos deben enviar las peticiones y el
-																						//metodo http
+	@RequestMapping(value = "/consultarUsuarioPorId/{id}", method = RequestMethod.GET)//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
 	public ResponseEntity<UsuarioConIgnore> consultaUsuarioPorId(@PathVariable("id") Integer id) {//Metodo que devuelve una entidad  
 																						//Usuario y recibe mediante el body un objeto de tipo usuario
 	 	Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(id);	//Llamamos al metodo del servicio consultaUsuarioPorId que nos devuelve un usuario
@@ -280,32 +277,7 @@ public class Controlador {
 	    }
 	}
 
-	
-	
 	// ---------------------------------------------------------------VIAJES------------------------------------------------------------------------- //
-		 
-	/* 
-	// REGISTRO VIAJES OBJETOS
-		@RequestMapping(value = "/registrarViaje", method = RequestMethod.POST)
-		public ResponseEntity<Viaje> registraViaje(@Valid @RequestBody Viaje viaje) {
-			Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(viaje.getUsuario().getIdusuario());
-			if(uOpt.isPresent()){
-				if(uOpt.get().getEsconductor()==true) {
-					Optional<Vehiculo>vOpt=VehiculoServicio.consultarVehiculoPorMatricula(viaje.getVehiculo().getMatricula());
-					if(vOpt.isPresent()) {
-						return new ResponseEntity<Viaje>(ViajeServicio.registraViaje(viaje), HttpStatus.OK);
-					} else {
-						return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
-					}
-				} else {
-					return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-				}
-			} else {
-				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-			}
-		}
-		 
-		 */
 		 
 	//REGISTRAR VIAJE
 	@RequestMapping(value = "/registrarViaje", method = RequestMethod.POST)
@@ -396,87 +368,77 @@ public class Controlador {
  		}
 	}
 	
-	
-	
 	//CONSULTAR VIAJE FILTRANDO
  	@RequestMapping(value="/consultaViajesReservar", method=RequestMethod.GET)
-	public ResponseEntity<List<ViajeConIgnore>> consultaViajesReservar(@RequestBody Map<String, String> param){
+	public ResponseEntity<List<Viaje>> consultaViajesReservar(@RequestBody Map<String, String> param){
  		
- 		if(!param.get("localidadOrigen").equals(null) && !param.get("lugarSalida").equals(null) && !param.get("localidadDestino").equals(null) && !param.get("lugarLlegada").equals(null) && !param.get("fechaSalida").equals(null) && param.get("horaSalida").equals(null)) {
+ 		if(!param.get("localidadOrigen").equals(null) && !param.get("lugarSalida").equals(null) 
+ 			&& !param.get("localidadDestino").equals(null) && !param.get("lugarLlegada").equals(null)
+ 			&& !param.get("fechaSalida").equals(null) && !param.get("precioMax").equals(null)) {
+ 			
  			String auxLocalidadOrigen=param.get("localidadOrigen");
  			String auxLugarSalida=param.get("lugarSalida");
  			String auxLocalidadDestino=param.get("localidadDestino");
  			String auxLugarLlegada=param.get("lugarLlegada");
- 			Date auxFechaSalida=Date.valueOf(param.get("fechaSalida"));
- 			
- 			List<Viaje> listaOriginal=ViajeServicio.muestraViajeSinHora(auxLocalidadOrigen, auxLocalidadDestino, auxFechaSalida);
- 			List<ViajeConIgnore> listaIgnore=new ArrayList<ViajeConIgnore>();
- 			
+ 			SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			java.util.Date auxFechaSalida=null;
+			try {auxFechaSalida = form.parse(param.get("fechaSalida"));} catch (ParseException e) {e.printStackTrace();}
+			Double precioAux= Double.valueOf(param.get("precioMax"));
+			BigDecimal auxPrecio=BigDecimal.valueOf(precioAux);
+			
+ 			List<Viaje> listaOriginal=ViajeServicio.muestraViajeDelDia(auxFechaSalida,auxPrecio);
+ 			//Filtramos la lista por localidad de origen y de destino:
+ 			for (int i = 0; i < listaOriginal.size(); i++) {
+				if(!Biblioteca.compruebaSiContieneLocalidad(listaOriginal.get(i).getLocalidadOrigen(), auxLocalidadOrigen)||!Biblioteca.compruebaSiContieneLocalidad(listaOriginal.get(i).getLocalidadDestino(), auxLocalidadDestino)) {
+					listaOriginal.remove(i);
+					i--;
+				}
+			}
+ 			//Limpiamos ciertos atributos para evitar la recursividad y por privacidad:
  			for(Viaje v: listaOriginal) {
- 				
- 				ViajeConIgnore vI = new ViajeConIgnore();
- 		 		vI.setLocalidadOrigen(v.getLocalidadOrigen());
- 		 		vI.setLugarSalida(v.getLugarSalida());
- 				vI.setLocalidadDestino(v.getLocalidadDestino());
- 				vI.setLugarLlegada(v.getLugarLlegada());
- 				vI.setFechasalida(v.getFechasalida());
- 				listaIgnore.add(vI);
- 				
+ 				v.getUsuario().setClave(null);
+ 				v.getUsuario().setPagosForIdusuarioconductor(null);
+ 				v.getUsuario().setPagosForIdusuariopasajero(null);
+ 				v.getUsuario().setReservas(null);
+ 				v.getUsuario().setVehiculos(null);
+ 				v.getUsuario().setViajes(null);
+ 				v.getVehiculo().setUsuario(null);
+ 				v.getVehiculo().setViajes(null);
  			}
- 			
- 			return new ResponseEntity<List<ViajeConIgnore>>(listaIgnore,HttpStatus.OK);
- 			
- 			
- 		}/*else if(!param.get("origen").equals(null) && !param.get("destino").equals(null) && !param.get("fechaSalida").equals(null) && !param.get("horaSalida").equals(null)) {
- 			String auxOrigen=param.get("origen");
- 			String auxDestino=param.get("destino");
- 			Date auxFechaSalida=Date.valueOf(param.get("fechaSalida"));
- 			Date auxHoraSalida=Date.valueOf(param.get("horaSalida"));
- 			
- 			List<Viaje> listaOriginal=ViajeServicio.muestraViajeConHora(auxOrigen, auxDestino, auxFechaSalida, auxHoraSalida);
- 			List<ViajeConIgnore> listaIgnore=new ArrayList<ViajeConIgnore>();
- 			
- 			for(Viaje v: listaOriginal) {
- 				
- 				ViajeConIgnore vI = new ViajeConIgnore();
- 		 		vI.setOrigen(v.getOrigen());
- 				vI.setDestino(v.getDestino());
- 				vI.setFechasalida(v.getFechasalida());
- 				vI.setHorasalida(v.getHorasalida());
- 				listaIgnore.add(vI);
- 				
+ 			//Ordenamos la lista por lugar de origen y de destino:
+ 			int i = 0;
+ 			List<Viaje> listaFinal = new ArrayList<Viaje>();
+ 			while(i<listaOriginal.size()) {
+ 				if(Biblioteca.compruebaSiContieneLocalidad(listaOriginal.get(i).getLugarSalida(), auxLugarSalida)&&Biblioteca.compruebaSiContieneLocalidad(listaOriginal.get(i).getLugarLlegada(), auxLugarLlegada)) {
+ 					listaFinal.add(listaOriginal.remove(i));
+ 					i--;
+ 				}
+ 				i++;
  			}
- 			
- 			return new ResponseEntity<List<ViajeConIgnore>>(listaIgnore,HttpStatus.OK);
- 			
- 		
- 				
- 		}*/else {
+ 			while(!listaOriginal.isEmpty()) {
+ 				listaFinal.add(listaOriginal.remove(0));
+ 			}
+ 			return new ResponseEntity<List<Viaje>>(listaFinal,HttpStatus.OK);
+ 		}else {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
  		}
 		
 	}
 	
  	//ELIMINAR VIAJE POR ID
- 		@RequestMapping(value = "/eliminarViaje/{id}", method = RequestMethod.DELETE)//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
- 		public ResponseEntity<Viaje> eliminarViaje(@PathVariable("id") Integer id) { //Metodo que elimina a un usuario por id
- 		    Optional<Viaje> vOpt=ViajeServicio.muestraViajePorId(id);				//Comprobams si el usuario existe
- 		    if (vOpt.isPresent()) {
- 		    	Viaje v= vOpt.get();														//Si existe establecemos a un objeto usuario los valores 
- 		    																				//asociados al id recibido
- 		    	return new ResponseEntity<>(ViajeServicio.eliminaViaje(v),HttpStatus.OK);//Si existe eliminamos el usuario solicitado
- 		    }else {	
- 		    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);						//Si el usuario no existe devolvemos un código de error
- 		    }
- 		}
+	@RequestMapping(value = "/eliminarViaje/{id}", method = RequestMethod.DELETE)	//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
+	public ResponseEntity<Viaje> eliminarViaje(@PathVariable("id") Integer id) { 	//Metodo que elimina a un usuario por id
+	    Optional<Viaje> vOpt=ViajeServicio.muestraViajePorId(id);					//Comprobams si el usuario existe
+	    if (vOpt.isPresent()) {
+	    	Viaje v= vOpt.get();														//Si existe establecemos a un objeto usuario los valores 
+	    																				//asociados al id recibido
+	    	return new ResponseEntity<>(ViajeServicio.eliminaViaje(v),HttpStatus.OK);	//Si existe eliminamos el usuario solicitado
+	    }else {	
+	    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);						//Si el usuario no existe devolvemos un código de error
+	    }
+	}
  	
- 	
- // -------------------------------------------------------------INCIDENCIAS----------------------------------------------------------------------- //
- 	
- 	
- 	
- // --------------------------------------------------------------VEHICULOS------------------------------------------------------------------------ //
- 
+ 	//--------------------------------------------------------------VEHICULOS------------------------------------------------------------------------
  	
  	//REGISTRAR VEHICULO
  	//MATRICULA, MARCA, MODELO, COMBUSTIBLE Y COLOR
@@ -531,7 +493,6 @@ public class Controlador {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
  		}
 	}
-
  	
  	//MOSTRAR VEHICULOS POR ID DE USUARIO
  	@RequestMapping(value = "/consultarVehiculoPorIdUsuario/{id}", method = RequestMethod.GET)
@@ -598,7 +559,6 @@ public class Controlador {
  	 		}
  	 		
  	}
-
  	
  	//ACTUALIZAR VEHICULO POR MATRICULA
  	@RequestMapping(value = "/actualizarVehiculo", method = RequestMethod.PUT)
@@ -641,50 +601,48 @@ public class Controlador {
  		}
  	}
  	
- 	
  	//ELIMINAR VEHICULO POR MATRICULA
- 	 	//Metodo que recibe un Integer con el Id a del Producto a eliminar desde la ruta de la petición y lo elimina si existe
- 		@RequestMapping(value = "/eliminarVehiculoPorMatricula/{matricula}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta
- 		public ResponseEntity<Vehiculo> eliminarVehiculoPorId(@PathVariable("matricula") String matricula) {
- 			
- 			matricula=matricula.replaceAll("\\s","").toUpperCase();
-			if(matricula.length()==7) {
-				try {
-					Integer.parseInt(matricula.substring(0, 4));
-					boolean pruebaLetras=true;
-					for(int i = 4 ; i < matricula.length() && pruebaLetras ; i++ ) {
-						if(matricula.charAt(i)<'A'||matricula.charAt(i)>'Z') {
-							pruebaLetras=false;
-							return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
-						}
+ 	//Metodo que recibe un Integer con el Id a del Producto a eliminar desde la ruta de la petición y lo elimina si existe
+	@RequestMapping(value = "/eliminarVehiculoPorMatricula/{matricula}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta
+	public ResponseEntity<Vehiculo> eliminarVehiculoPorId(@PathVariable("matricula") String matricula) {
+		
+		matricula=matricula.replaceAll("\\s","").toUpperCase();
+		if(matricula.length()==7) {
+			try {
+				Integer.parseInt(matricula.substring(0, 4));
+				boolean pruebaLetras=true;
+				for(int i = 4 ; i < matricula.length() && pruebaLetras ; i++ ) {
+					if(matricula.charAt(i)<'A'||matricula.charAt(i)>'Z') {
+						pruebaLetras=false;
+						return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
 					}
-				}catch (NumberFormatException n){
-					return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
 				}
-				
-			}else {
-				return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);	
+			}catch (NumberFormatException n){
+				return new ResponseEntity<>(null,HttpStatus.FORBIDDEN);	
 			}
- 			
- 		    Optional<Vehiculo> vOpt=VehiculoServicio.consultaVehiculoPorMatricula(matricula);
- 		    if (vOpt.isPresent()) {
- 		    	Vehiculo v= vOpt.get();
- 		    	Integer auxIdUsuario=v.getUsuario().getIdusuario();
- 		    	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
- 		    	Usuario u=uOpt.get();
- 		    	VehiculoServicio.eliminaVehiculo(v);//Si el vehiculo existe, llamamos al metodo eliminar del servicio
- 		    	Integer numVehiculos=VehiculoServicio.cuentaVehiculoPorIdUsuario(auxIdUsuario);
- 		    	if(numVehiculos==0) {
- 		    		u.setEsconductor(false);
- 		    		UsuarioServicio.actualizaUsuario(u);
- 		    	}
- 		    	return new ResponseEntity<>(null,HttpStatus.OK);//Si existe eliminamos el vehiculo solicitado
- 		    }
- 		    else {
- 		    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
- 		    }
- 		 }
-
+			
+		}else {
+			return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);	
+		}
+		
+	    Optional<Vehiculo> vOpt=VehiculoServicio.consultaVehiculoPorMatricula(matricula);
+	    if (vOpt.isPresent()) {
+	    	Vehiculo v= vOpt.get();
+	    	Integer auxIdUsuario=v.getUsuario().getIdusuario();
+	    	Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+	    	Usuario u=uOpt.get();
+	    	VehiculoServicio.eliminaVehiculo(v);//Si el vehiculo existe, llamamos al metodo eliminar del servicio
+	    	Integer numVehiculos=VehiculoServicio.cuentaVehiculoPorIdUsuario(auxIdUsuario);
+	    	if(numVehiculos==0) {
+	    		u.setEsconductor(false);
+	    		UsuarioServicio.actualizaUsuario(u);
+	    	}
+	    	return new ResponseEntity<>(null,HttpStatus.OK);//Si existe eliminamos el vehiculo solicitado
+	    }
+	    else {
+	    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+	    }
+	 }
  	
  	//ELIMINAR VEHICULO POR ID
  	//Metodo que recibe un Integer con el Id a del Producto a eliminar desde la ruta de la petición y lo elimina si existe

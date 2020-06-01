@@ -1,6 +1,7 @@
 package com.cisyapp.rest.servicio;
 
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,18 +36,18 @@ public class ViajeServicio {
 		return ViajeRepositorio.findById(id);
 	}
 	
-	public List<Viaje> muestraViajeSinHora(String origen, String destino, Date fecha){
-		return ViajeRepositorio.mostrarViajesSinHora(origen, destino, fecha);
+	//Metodo para obtener una lista con los viajes de ese dia y luego tratarla:
+	public List<Viaje> muestraViajeDelDia(java.util.Date fecha, BigDecimal precio){
+		SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String auxFechaIni=form.format(fecha);
+		String auxFechaFin=form.format(fecha).substring(0,10)+" 23:59:59";
+		return ViajeRepositorio.mostrarViajesDelDia(auxFechaIni,auxFechaFin,precio);
 	}
 	
-	public List<Viaje> muestraViajeConHora(String origen, String destino, Date fecha, Date hora){
-		return ViajeRepositorio.mostrarViajesConHora(origen, destino, fecha, hora);
+	//Metodo para eliminar un Viaje:
+	public Viaje eliminaViaje(Viaje v) {
+		ViajeRepositorio.delete(v);
+		return null;
 	}
-	
-	//Metodo para eliminar un Viaje
-		public Viaje eliminaViaje(Viaje v) {
-			ViajeRepositorio.delete(v);
-			return null;
-			}
 
 }

@@ -93,7 +93,7 @@ public class Viaje implements java.io.Serializable {
 		this.idviaje = idviaje;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "idusuarioconductor", nullable = false)
 	public Usuario getUsuario() {
 		return this.usuario;
@@ -103,7 +103,7 @@ public class Viaje implements java.io.Serializable {
 		this.usuario = usuario;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "idvehiculo", nullable = false)
 	public Vehiculo getVehiculo() {
 		return this.vehiculo;
@@ -187,7 +187,7 @@ public class Viaje implements java.io.Serializable {
 		this.fechacreacionviaje = fechacreacionviaje;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "viaje")
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "viaje")
 	public Set<Reserva> getReservas() {
 		return this.reservas;
 	}
