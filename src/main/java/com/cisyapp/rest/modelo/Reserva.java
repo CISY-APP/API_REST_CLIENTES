@@ -50,7 +50,7 @@ public class Reserva implements java.io.Serializable {
 		this.id = id;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "idusuariopasajero", nullable = false, insertable = false, updatable = false)
 	public Usuario getUsuario() {
 		return this.usuario;
@@ -60,7 +60,7 @@ public class Reserva implements java.io.Serializable {
 		this.usuario = usuario;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "idviaje", nullable = false, insertable = false, updatable = false)
 	public Viaje getViaje() {
 		return this.viaje;

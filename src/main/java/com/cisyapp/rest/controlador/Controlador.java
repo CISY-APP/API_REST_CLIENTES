@@ -21,16 +21,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.cisyapp.rest.clasesaux.ReservaConIgnore;
 import com.cisyapp.rest.clasesaux.UsuarioConIgnore;
 import com.cisyapp.rest.clasesaux.VehiculoConIgnore;
 import com.cisyapp.rest.clasesaux.ViajeConIgnore;
+import com.cisyapp.rest.modelo.Reserva;
+import com.cisyapp.rest.modelo.ReservaId;
 import com.cisyapp.rest.modelo.Usuario;
 import com.cisyapp.rest.modelo.Vehiculo;
 import com.cisyapp.rest.modelo.Viaje;
+import com.cisyapp.rest.servicio.ReservaServicio;
 import com.cisyapp.rest.servicio.UsuarioServicio;
 import com.cisyapp.rest.servicio.VehiculoServicio;
 import com.cisyapp.rest.servicio.ViajeServicio;
-import com.cisyapp.rest.controlador.Biblioteca;
 
 @Controller
 public class Controlador {
@@ -43,6 +46,9 @@ public class Controlador {
 	
 	@Autowired
 	private VehiculoServicio VehiculoServicio;
+	
+	@Autowired
+	private ReservaServicio ReservaServicio;
 	
 	// -------------------------------------------------------------USUARIOS----------------------------------------------------------------------- //
 	//REGISTRO USUARIOS 
@@ -373,13 +379,14 @@ public class Controlador {
 	}
 	
 	//CONSULTAR VIAJE FILTRANDO
- 	@RequestMapping(value="/consultaViajesReservar", method=RequestMethod.GET)
+ 	@RequestMapping(value="/consultaViajesReservar", method=RequestMethod.POST)
 	public ResponseEntity<List<Viaje>> consultaViajesReservar(@RequestBody Map<String, String> param){
  		
- 		if(!param.get("localidadOrigen").equals(null) && !param.get("lugarSalida").equals(null) 
+ 		if(!param.get("idUsuario").equals(null)&&!param.get("localidadOrigen").equals(null) && !param.get("lugarSalida").equals(null) 
  			&& !param.get("localidadDestino").equals(null) && !param.get("lugarLlegada").equals(null)
  			&& !param.get("fechaSalida").equals(null) && !param.get("precioMax").equals(null)) {
  			
+ 			int id = Integer.parseInt(param.get("idUsuario"));
  			String auxLocalidadOrigen=param.get("localidadOrigen");
  			String auxLugarSalida=param.get("lugarSalida");
  			String auxLocalidadDestino=param.get("localidadDestino");
@@ -390,7 +397,7 @@ public class Controlador {
 			Double precioAux= Double.valueOf(param.get("precioMax"));
 			BigDecimal auxPrecio=BigDecimal.valueOf(precioAux);
 			
- 			List<Viaje> listaOriginal=ViajeServicio.muestraViajeDelDia(auxFechaSalida,auxPrecio);
+ 			List<Viaje> listaOriginal=ViajeServicio.muestraViajeDelDia(id,auxFechaSalida,auxPrecio);
  			//Filtramos la lista por localidad de origen y de destino:
  			for (int i = 0; i < listaOriginal.size(); i++) {
 				if(!Biblioteca.compruebaSiContieneLocalidad(listaOriginal.get(i).getLocalidadOrigen(), auxLocalidadOrigen)||!Biblioteca.compruebaSiContieneLocalidad(listaOriginal.get(i).getLocalidadDestino(), auxLocalidadDestino)) {
@@ -442,6 +449,7 @@ public class Controlador {
 	    }
 	}
  	
+	 	
  	//--------------------------------------------------------------VEHICULOS------------------------------------------------------------------------
  	
  	//REGISTRAR VEHICULO
@@ -673,5 +681,39 @@ public class Controlador {
 	    else {
 	    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
 	    }
-	 }
+	} 	
+	
+	//--------------------------------------------------------------RESERVAS------------------------------------------------------------------------
+	
+	//REGISTRAR UNA RESERVA
+	@RequestMapping(value = "/registrarReserva", method = RequestMethod.POST)
+	public ResponseEntity<ReservaConIgnore> registraReserva(@RequestBody Map<String, String> param) {
+ 		Integer auxIdUsuario=Integer.parseInt(param.get("idUsuario"));
+ 		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(auxIdUsuario);
+ 		Integer auxIdViaje=Integer.parseInt(param.get("idViaje"));
+ 		Optional<Viaje>vOpt=ViajeServicio.muestraViajePorId(auxIdViaje);
+ 		if(uOpt.isPresent()&&vOpt.isPresent()&&vOpt.get().getNumplazasdisponibles()>0) {
+ 			Reserva r = new Reserva();
+ 			ReservaId ri = new ReservaId();
+ 			ri.setIdusuariopasajero(uOpt.get().getIdusuario());
+ 			ri.setIdviaje(vOpt.get().getIdviaje());
+ 			r.setId(ri);
+ 			r.setUsuario(uOpt.get());
+ 			r.setViaje(vOpt.get());
+			r=ReservaServicio.registraReserva(r);
+			
+			vOpt.get().setNumplazasdisponibles(vOpt.get().getNumplazasdisponibles()-1);
+			ViajeServicio.actualizaViaje(vOpt.get());
+			
+			ReservaConIgnore rIg = new ReservaConIgnore();
+			rIg.setFechareserva(r.getFechareserva());
+			rIg.setId(r.getId());
+			rIg.setUsuario(r.getUsuario());
+			rIg.setViaje(r.getViaje());
+			return new ResponseEntity<>(rIg, HttpStatus.OK);
+			
+ 		}else {
+ 			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
+ 		}
+	}
 }

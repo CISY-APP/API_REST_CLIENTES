@@ -17,37 +17,32 @@ public class ViajeServicio {
 	@Autowired
 	private ViajeRepositorio ViajeRepositorio;
 	
-	// Metodo utilizado para registrar un nuevo viaje en la cuenta de un usuario.
+	// Metodo utilizado para registrar un nuevo viaje en la cuenta de un usuario:
 	public Viaje registraViaje(Viaje viaje) {
 		return ViajeRepositorio.save(viaje);
 	}
-
-	/*Este metodo es utilizado para devolver los viajes que cumplan con unos requisitos, estos requisitos son:
-	 * - Origen
-	 * - Destino
-	 * - Fecha
-	 *  -Hora
-	 */
-	//public List<Viaje> consultaViajesReservar(String origen, String destino, String fecha, String hora) {
-		//return ViajeRepositorio.buscarViajeReservar(origen, destino, fecha, hora);
-	//}
 	
+	// Metodo que muestra viaje por id:
 	public Optional <Viaje> muestraViajePorId(Integer id) {
 		return ViajeRepositorio.findById(id);
 	}
 	
-	//Metodo para obtener una lista con los viajes de ese dia y luego tratarla:
-	public List<Viaje> muestraViajeDelDia(java.util.Date fecha, BigDecimal precio){
+	// Metodo para obtener una lista con los viajes de ese dia y luego tratarla, no obtiene los viajes que pertenecen al mismo usuario:
+	public List<Viaje> muestraViajeDelDia(int id, java.util.Date fecha, BigDecimal precio){
 		SimpleDateFormat form = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String auxFechaIni=form.format(fecha);
 		String auxFechaFin=form.format(fecha).substring(0,10)+" 23:59:59";
-		return ViajeRepositorio.mostrarViajesDelDia(auxFechaIni,auxFechaFin,precio);
+		return ViajeRepositorio.mostrarViajesDelDia(auxFechaIni,auxFechaFin,precio,id);
 	}
 	
-	//Metodo para eliminar un Viaje:
+	// Metodo para eliminar un Viaje:
 	public Viaje eliminaViaje(Viaje v) {
 		ViajeRepositorio.delete(v);
 		return null;
+	}
+	// Metodo para actualizar viaje por id (Num plazas)
+	public Viaje actualizaViaje(Viaje v) {
+		return ViajeRepositorio.save(v);
 	}
 
 }
