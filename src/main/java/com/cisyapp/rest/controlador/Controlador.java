@@ -378,7 +378,7 @@ public class Controlador {
  		}
 	}
 	
-	//CONSULTAR VIAJE FILTRANDO
+	//CONSULTAR VIAJE FILTRANDO POR FECHA, LOCALIDAD ORIGEN Y DESTINO, PRECIO ...
  	@RequestMapping(value="/consultaViajesReservar", method=RequestMethod.POST)
 	public ResponseEntity<List<Viaje>> consultaViajesReservar(@RequestBody Map<String, String> param){
  		
@@ -441,10 +441,9 @@ public class Controlador {
  		}else {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
  		}
-		
 	}
 	
- 	//ELIMINAR VIAJE POR ID
+ 	//ELIMINAR VIAJE POR ID VIAJE
 	@RequestMapping(value = "/eliminarViaje/{id}", method = RequestMethod.DELETE)	//Definimos la URI a la que nos deben enviar las peticiones y el metodo http
 	public ResponseEntity<Viaje> eliminarViaje(@PathVariable("id") Integer id) { 	//Metodo que elimina a un usuario por id
 	    Optional<Viaje> vOpt=ViajeServicio.muestraViajePorId(id);					//Comprobams si el usuario existe
@@ -457,7 +456,77 @@ public class Controlador {
 	    }
 	}
  	
-	 	
+	//CONSULTAR LOS VIAJES QUE EL USUARIO HA RESERVADO A LO LARGO DEL TIEMPO(NO SE FILTRA POR PRESENTE O PASADO)
+ 	@RequestMapping(value="/consultarViajesReservadosPorIdUsuario/{idUsuario}", method=RequestMethod.GET)
+	public ResponseEntity<List<Viaje>> consultaViajesReservados(@PathVariable("idUsuario") Integer idUsuario){
+		Optional <List<Reserva>> listOpt=ReservaServicio.muestraReservasPorIdUsuario(idUsuario);
+		if(listOpt.isPresent()) {
+			List<Viaje> listFinal = new ArrayList<Viaje>();
+			for (int i=0 ; i<listOpt.get().size() ; i++) {
+				Optional<Viaje> vOpt = ViajeServicio.muestraViajePorId(listOpt.get().get(i).getId().getIdviaje());
+				if(vOpt.isPresent()) {
+					Viaje vF = new Viaje();
+					vF.setFechacreacionviaje(vOpt.get().getFechacreacionviaje());
+					vF.setFechasalida(vOpt.get().getFechasalida());
+					vF.setIdviaje(vOpt.get().getIdviaje());
+					vF.setLocalidadDestino(vOpt.get().getLocalidadDestino());
+					vF.setLocalidadOrigen(vOpt.get().getLocalidadOrigen());
+					vF.setLugarLlegada(vOpt.get().getLugarLlegada());
+					vF.setLugarSalida(vOpt.get().getLugarSalida());
+					vF.setNumplazasdisponibles(vOpt.get().getNumplazasdisponibles());
+					vF.setPrecio(vOpt.get().getPrecio());
+					vF.setReservas(null);
+					vF.setUsuario(vOpt.get().getUsuario());;
+					vF.getUsuario().setClave(null);
+	 				vF.getUsuario().setPagosForIdusuarioconductor(null);
+	 				vF.getUsuario().setPagosForIdusuariopasajero(null);
+	 				vF.getUsuario().setReservas(null);
+	 				vF.getUsuario().setVehiculos(null);
+	 				vF.getUsuario().setViajes(null);
+	 				vF.setVehiculo(vOpt.get().getVehiculo());
+	 				vF.getVehiculo().setUsuario(null);
+	 				vF.getVehiculo().setViajes(null);
+	 				listFinal.add(vF);
+				}
+			}
+			return new ResponseEntity<List<Viaje>>(listFinal, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<List<Viaje>>(HttpStatus.NOT_FOUND);
+		}
+	}
+ 	
+ 	//CONSULTAR VIAJE POR ID VIAJE
+ 	@RequestMapping(value="/consultarViajePorIdViaje/{idViaje}", method=RequestMethod.GET)
+	public ResponseEntity<Viaje> consultaViajePorIdViaje(@PathVariable("idViaje") Integer idViaje){
+		Optional<Viaje> vOpt = ViajeServicio.muestraViajePorId(idViaje);
+		if(vOpt.isPresent()) {
+			Viaje vF = new Viaje();
+			vF.setFechacreacionviaje(vOpt.get().getFechacreacionviaje());
+			vF.setFechasalida(vOpt.get().getFechasalida());
+			vF.setIdviaje(vOpt.get().getIdviaje());
+			vF.setLocalidadDestino(vOpt.get().getLocalidadDestino());
+			vF.setLocalidadOrigen(vOpt.get().getLocalidadOrigen());
+			vF.setLugarLlegada(vOpt.get().getLugarLlegada());
+			vF.setLugarSalida(vOpt.get().getLugarSalida());
+			vF.setNumplazasdisponibles(vOpt.get().getNumplazasdisponibles());
+			vF.setPrecio(vOpt.get().getPrecio());
+			vF.setReservas(null);
+			vF.setUsuario(vOpt.get().getUsuario());;
+			vF.getUsuario().setClave(null);
+			vF.getUsuario().setPagosForIdusuarioconductor(null);
+			vF.getUsuario().setPagosForIdusuariopasajero(null);
+			vF.getUsuario().setReservas(null);
+			vF.getUsuario().setVehiculos(null);
+			vF.getUsuario().setViajes(null);
+			vF.setVehiculo(vOpt.get().getVehiculo());
+			vF.getVehiculo().setUsuario(null);
+			vF.getVehiculo().setViajes(null);
+			return new ResponseEntity<Viaje>(vF, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<Viaje>(HttpStatus.NOT_FOUND);
+		}
+	}
+ 	
  	//--------------------------------------------------------------VEHICULOS------------------------------------------------------------------------
  	
  	//REGISTRAR VEHICULO
@@ -725,7 +794,7 @@ public class Controlador {
  		}
 	}
 	
-	//MOSTRAR RESERVAS POR IDRESERVA
+	//MOSTRAR RESERVA POR IDRESERVA
  	@RequestMapping(value = "/consultarReservaPorIdReserva/{id}", method = RequestMethod.GET)
 	public ResponseEntity<ReservaConIgnore> consultaReservaPorIdReserva(@PathVariable("id") Integer id) {
  		Optional<Reserva>rOpt=ReservaServicio.muestraReservaPorIdReserva(id);
@@ -741,7 +810,7 @@ public class Controlador {
  		}	
 	}
  	
- 	//MOSTRAR RESERVAS POR IDUSUARIO e IDVIAJE
+ 	//MOSTRAR RESERVA POR IDUSUARIO e IDVIAJE
  	@RequestMapping(value = "/consultarReservaPorIdUsuarioYidViaje/{idUsuario}/{idViaje}", method = RequestMethod.GET)
 	public ResponseEntity<ReservaConIgnore> consultaReservaPorIdUsuarioYidViaje(@PathVariable("idUsuario") Integer idUsuario, @PathVariable("idViaje") Integer idViaje) {
  		Optional<Reserva>rOpt=ReservaServicio.muestraReservaPorIdUsuarioYidViaje(idUsuario,idViaje);
@@ -754,6 +823,26 @@ public class Controlador {
  			return new ResponseEntity<ReservaConIgnore>(rIg, HttpStatus.OK);
  		}else {
  			return new ResponseEntity<ReservaConIgnore>(HttpStatus.NOT_FOUND);
+ 		}	
+	}
+ 	
+ 	//MOSTRAR RESERVAS POR IDUSUARIO
+ 	@RequestMapping(value = "/consultarReservasPorIdUsuario/{idUsuario}", method = RequestMethod.GET)
+	public ResponseEntity <List<ReservaConIgnore>> consultaReservasPorIdUsuario(@PathVariable("idUsuario") Integer idUsuario) {
+ 		Optional <List<Reserva>> listOpt=ReservaServicio.muestraReservasPorIdUsuario(idUsuario);
+ 		if(listOpt.isPresent()) {
+			List<ReservaConIgnore> listFinal = new ArrayList<ReservaConIgnore>();
+			for (int i=0 ; i<listOpt.get().size() ; i++) {
+				ReservaConIgnore rIg = new ReservaConIgnore();
+				rIg.setFechareserva(listOpt.get().get(i).getFechareserva());
+				rIg.setId(listOpt.get().get(i).getId());
+				rIg.setUsuario(listOpt.get().get(i).getUsuario());
+				rIg.setViaje(listOpt.get().get(i).getViaje());
+				listFinal.add(rIg);
+			}
+ 			return new ResponseEntity<List<ReservaConIgnore>>(listFinal, HttpStatus.OK);
+ 		}else {
+ 			return new ResponseEntity<List<ReservaConIgnore>>(HttpStatus.NOT_FOUND);
  		}	
 	}
 }

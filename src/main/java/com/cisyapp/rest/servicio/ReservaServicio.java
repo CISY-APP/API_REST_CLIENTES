@@ -1,5 +1,6 @@
 package com.cisyapp.rest.servicio;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,5 +28,10 @@ public class ReservaServicio {
 	// Metodo que muestra una reserva por idusuario e idviaje:
 	public Optional <Reserva> muestraReservaPorIdUsuarioYidViaje(Integer idUsuario, Integer idViaje) {
 		return ReservaRepositorio.findByIdUsuarioYidViaje(idUsuario,idViaje);
+	}
+	
+	// Metodo que muestra las reservas por idusuario:
+	public Optional <List<Reserva>> muestraReservasPorIdUsuario(Integer idUsuario) {
+		return ReservaRepositorio.obtenerReservasUsuarioByIdUsuario(idUsuario);
 	}
 }
