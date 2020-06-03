@@ -1,5 +1,7 @@
 package com.cisyapp.rest.servicio;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,5 +18,14 @@ public class ReservaServicio {
 	public Reserva registraReserva(Reserva reserva) {
 		return ReservaRepositorio.save(reserva);
 	}
+	
+	// Metodo que muestra una reserva por id:
+	public Optional <Reserva> muestraReservaPorIdReserva(Integer idReserva) {
+		return ReservaRepositorio.findById(idReserva);
+	}
 
+	// Metodo que muestra una reserva por idusuario e idviaje:
+	public Optional <Reserva> muestraReservaPorIdUsuarioYidViaje(Integer idUsuario, Integer idViaje) {
+		return ReservaRepositorio.findByIdUsuarioYidViaje(idUsuario,idViaje);
+	}
 }

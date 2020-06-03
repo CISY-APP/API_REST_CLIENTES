@@ -405,6 +405,14 @@ public class Controlador {
 					i--;
 				}
 			}
+ 			//Filtremos los viajes que el usuario ya ha reservado una vez
+ 			for (int i = 0; i < listaOriginal.size(); i++) {
+ 				Optional<Reserva>rOpt=ReservaServicio.muestraReservaPorIdUsuarioYidViaje(id,listaOriginal.get(i).getIdviaje());
+				if(rOpt.isPresent()) {
+					listaOriginal.remove(i);
+					i--;
+				}
+			}
  			//Limpiamos ciertos atributos para evitar la recursividad y por privacidad:
  			for(Viaje v: listaOriginal) {
  				v.getUsuario().setClave(null);
@@ -715,5 +723,37 @@ public class Controlador {
  		}else {
  			return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);	
  		}
+	}
+	
+	//MOSTRAR RESERVAS POR IDRESERVA
+ 	@RequestMapping(value = "/consultarReservaPorIdReserva/{id}", method = RequestMethod.GET)
+	public ResponseEntity<ReservaConIgnore> consultaReservaPorIdReserva(@PathVariable("id") Integer id) {
+ 		Optional<Reserva>rOpt=ReservaServicio.muestraReservaPorIdReserva(id);
+ 		if(rOpt.isPresent()) {
+			ReservaConIgnore rIg = new ReservaConIgnore();
+			rIg.setFechareserva(rOpt.get().getFechareserva());
+			rIg.setId(rOpt.get().getId());
+			rIg.setUsuario(rOpt.get().getUsuario());
+			rIg.setViaje(rOpt.get().getViaje());
+ 			return new ResponseEntity<ReservaConIgnore>(rIg, HttpStatus.OK);
+ 		}else {
+ 			return new ResponseEntity<ReservaConIgnore>(HttpStatus.NOT_FOUND);
+ 		}	
+	}
+ 	
+ 	//MOSTRAR RESERVAS POR IDUSUARIO e IDVIAJE
+ 	@RequestMapping(value = "/consultarReservaPorIdUsuarioYidViaje/{idUsuario}/{idViaje}", method = RequestMethod.GET)
+	public ResponseEntity<ReservaConIgnore> consultaReservaPorIdUsuarioYidViaje(@PathVariable("idUsuario") Integer idUsuario, @PathVariable("idViaje") Integer idViaje) {
+ 		Optional<Reserva>rOpt=ReservaServicio.muestraReservaPorIdUsuarioYidViaje(idUsuario,idViaje);
+ 		if(rOpt.isPresent()) {
+			ReservaConIgnore rIg = new ReservaConIgnore();
+			rIg.setFechareserva(rOpt.get().getFechareserva());
+			rIg.setId(rOpt.get().getId());
+			rIg.setUsuario(rOpt.get().getUsuario());
+			rIg.setViaje(rOpt.get().getViaje());
+ 			return new ResponseEntity<ReservaConIgnore>(rIg, HttpStatus.OK);
+ 		}else {
+ 			return new ResponseEntity<ReservaConIgnore>(HttpStatus.NOT_FOUND);
+ 		}	
 	}
 }
