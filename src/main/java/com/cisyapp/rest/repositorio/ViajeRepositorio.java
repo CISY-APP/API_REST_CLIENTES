@@ -15,4 +15,7 @@ public interface ViajeRepositorio extends JpaRepository<Viaje, Integer>{
 	@Query(value = "SELECT * FROM viaje WHERE fechasalida >=  ?1 AND fechasalida <= ?2 AND precio <= ?3 AND numplazasdisponibles >=1 AND idusuarioconductor != ?4 ORDER BY fechasalida ASC", nativeQuery = true)
 	List<Viaje> mostrarViajesDelDia(@Param("fechasalida") String fechaIni, @Param("fechasalida") String fechaFin, @Param("precio") BigDecimal precioMax, @Param("idusuarioconductor") int id);
 	
+	//Metodo para consultar los viajes publicados por un usuario:
+	@Query(value = "SELECT * FROM viaje WHERE idusuarioconductor = ?1 ORDER BY fechasalida ASC", nativeQuery = true)
+	List<Viaje> mostrarViajesPublicados(@Param("idusuarioconductor") Integer idusuarioconductor);
 }

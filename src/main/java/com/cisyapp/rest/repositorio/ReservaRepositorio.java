@@ -22,4 +22,8 @@ public interface ReservaRepositorio extends JpaRepository<Reserva, Integer>{
 	//Metodo para obtener las reservas por idusuario:
 	@Query(value = "SELECT * FROM reserva WHERE idusuariopasajero=?1", nativeQuery = true)
 	Optional <List<Reserva>> obtenerReservasUsuarioByIdUsuario(@Param("idusuariopasajero") Integer idUsuario);
+	
+	//Metodo para obtener las reservas por idviaje:
+	@Query(value = "SELECT * FROM reserva WHERE idviaje=?1", nativeQuery = true)
+	Optional <List<Reserva>> obtenerReservasUsuarioByIdViaje(@Param("idviaje") Integer idviaje);
 }

@@ -25,6 +25,8 @@ import com.cisyapp.rest.clasesaux.ReservaConIgnore;
 import com.cisyapp.rest.clasesaux.UsuarioConIgnore;
 import com.cisyapp.rest.clasesaux.VehiculoConIgnore;
 import com.cisyapp.rest.clasesaux.ViajeConIgnore;
+import com.cisyapp.rest.clasesviajespublicados.UsuarioPublicado;
+import com.cisyapp.rest.clasesviajespublicados.ViajePublicado;
 import com.cisyapp.rest.modelo.Reserva;
 import com.cisyapp.rest.modelo.ReservaId;
 import com.cisyapp.rest.modelo.Usuario;
@@ -495,9 +497,36 @@ public class Controlador {
 		}
 	}
  	
+ 	//CONSULTAR LOS VIAJES PUBLICADOS QUE EL USUARIO HA PUBLICADO A LO LARGO DEL TIEMPO(NO SE FILTRA POR PRESENTE O PASADO)
+ 	@RequestMapping(value="/consultarViajesPublicadosPorIdUsuario/{idUsuario}", method=RequestMethod.GET)
+	public ResponseEntity<List<ViajePublicado>> consultaViajesPublicados(@PathVariable("idUsuario") Integer idUsuario){
+		List<Viaje> listViajes = ViajeServicio.muestraViajesPublicados(idUsuario);
+		List<ViajePublicado> listFinal = new ArrayList<ViajePublicado>();
+		if(!listViajes.equals(null)&&!listViajes.isEmpty()) {
+			for (int i=0 ; i<listViajes.size() ; i++) {
+				Optional <List<Reserva>> listOptReser=ReservaServicio.muestraReservasPorIdViaje(listViajes.get(i).getIdviaje());
+				if(listOptReser.isPresent()) {
+					List<UsuarioPublicado> listUsuario = new ArrayList<UsuarioPublicado>();
+					for(int j=0 ; j < listOptReser.get().size() ; j++) {
+						Optional<Usuario> uOpt=UsuarioServicio.consultaUsuarioPorId(listOptReser.get().get(j).getId().getIdusuariopasajero());
+						if(uOpt.isPresent()) {
+							listUsuario.add(new UsuarioPublicado(uOpt.get().getIdusuario(),uOpt.get().getNombre(),uOpt.get().getApellidos(),uOpt.get().getTelefono(),
+									uOpt.get().getEmail(),uOpt.get().getFechanacimiento(),uOpt.get().getFotousuario(),uOpt.get().getDescripcion()));
+						}
+					}
+					listFinal.add(new ViajePublicado(listViajes.get(i).getIdviaje(), listViajes.get(i).getLocalidadOrigen(), listViajes.get(i).getLugarSalida(), listViajes.get(i).getLocalidadDestino(),
+							listViajes.get(i).getLugarLlegada(), listViajes.get(i).getPrecio(), listViajes.get(i).getNumplazasdisponibles(), listViajes.get(i).getFechasalida(), listViajes.get(i).getFechacreacionviaje(), listUsuario));
+				}
+			}
+			return new ResponseEntity<List<ViajePublicado>>(listFinal, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<List<ViajePublicado>>(HttpStatus.NOT_FOUND);
+		}
+	}
+ 	
  	//CONSULTAR VIAJE POR ID VIAJE
  	@RequestMapping(value="/consultarViajePorIdViaje/{idViaje}", method=RequestMethod.GET)
-	public ResponseEntity<Viaje> consultaViajePorIdViaje(@PathVariable("idViaje") Integer idViaje){
+	public ResponseEntity<Viaje> consultarViajePorIdViaje(@PathVariable("idViaje") Integer idViaje){
 		Optional<Viaje> vOpt = ViajeServicio.muestraViajePorId(idViaje);
 		if(vOpt.isPresent()) {
 			Viaje vF = new Viaje();
@@ -830,6 +859,26 @@ public class Controlador {
  	@RequestMapping(value = "/consultarReservasPorIdUsuario/{idUsuario}", method = RequestMethod.GET)
 	public ResponseEntity <List<ReservaConIgnore>> consultaReservasPorIdUsuario(@PathVariable("idUsuario") Integer idUsuario) {
  		Optional <List<Reserva>> listOpt=ReservaServicio.muestraReservasPorIdUsuario(idUsuario);
+ 		if(listOpt.isPresent()) {
+			List<ReservaConIgnore> listFinal = new ArrayList<ReservaConIgnore>();
+			for (int i=0 ; i<listOpt.get().size() ; i++) {
+				ReservaConIgnore rIg = new ReservaConIgnore();
+				rIg.setFechareserva(listOpt.get().get(i).getFechareserva());
+				rIg.setId(listOpt.get().get(i).getId());
+				rIg.setUsuario(listOpt.get().get(i).getUsuario());
+				rIg.setViaje(listOpt.get().get(i).getViaje());
+				listFinal.add(rIg);
+			}
+ 			return new ResponseEntity<List<ReservaConIgnore>>(listFinal, HttpStatus.OK);
+ 		}else {
+ 			return new ResponseEntity<List<ReservaConIgnore>>(HttpStatus.NOT_FOUND);
+ 		}	
+	}
+ 	
+ 	//MOSTRAR RESERVAS POR IDVIAJE
+ 	@RequestMapping(value = "/consultarReservasPorIdViaje/{idViaje}", method = RequestMethod.GET)
+	public ResponseEntity <List<ReservaConIgnore>> consultaReservasPorIdViaje(@PathVariable("idViaje") Integer idViaje) {
+ 		Optional <List<Reserva>> listOpt=ReservaServicio.muestraReservasPorIdViaje(idViaje);
  		if(listOpt.isPresent()) {
 			List<ReservaConIgnore> listFinal = new ArrayList<ReservaConIgnore>();
 			for (int i=0 ; i<listOpt.get().size() ; i++) {

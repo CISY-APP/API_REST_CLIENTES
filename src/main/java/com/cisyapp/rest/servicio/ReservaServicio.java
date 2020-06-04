@@ -34,4 +34,9 @@ public class ReservaServicio {
 	public Optional <List<Reserva>> muestraReservasPorIdUsuario(Integer idUsuario) {
 		return ReservaRepositorio.obtenerReservasUsuarioByIdUsuario(idUsuario);
 	}
+	
+	// Metodo que muestra las reservas por idviaje:
+	public Optional <List<Reserva>> muestraReservasPorIdViaje(Integer idViaje) {
+		return ReservaRepositorio.obtenerReservasUsuarioByIdViaje(idViaje);
+	}
 }

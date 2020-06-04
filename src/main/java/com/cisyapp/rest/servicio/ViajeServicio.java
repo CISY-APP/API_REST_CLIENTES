@@ -4,10 +4,8 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.cisyapp.rest.modelo.Viaje;
 import com.cisyapp.rest.repositorio.ViajeRepositorio;
 
@@ -33,6 +31,11 @@ public class ViajeServicio {
 		String auxFechaIni=form.format(fecha);
 		String auxFechaFin=form.format(fecha).substring(0,10)+" 23:59:59";
 		return ViajeRepositorio.mostrarViajesDelDia(auxFechaIni,auxFechaFin,precio,id);
+	}
+	
+	// Metodo para obtener una lista con los viajes publicados por el usuario:
+	public List<Viaje> muestraViajesPublicados(Integer idUsuario){
+		return ViajeRepositorio.mostrarViajesPublicados(idUsuario);
 	}
 	
 	// Metodo para eliminar un Viaje:
