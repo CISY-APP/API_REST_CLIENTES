@@ -450,8 +450,7 @@ public class Controlador {
 	public ResponseEntity<Viaje> eliminarViaje(@PathVariable("id") Integer id) { 	//Metodo que elimina a un usuario por id
 	    Optional<Viaje> vOpt=ViajeServicio.muestraViajePorId(id);					//Comprobams si el usuario existe
 	    if (vOpt.isPresent()) {
-	    	Viaje v= vOpt.get();														//Si existe establecemos a un objeto usuario los valores 
-	    																				//asociados al id recibido
+	    	Viaje v= vOpt.get();														//Si existe establecemos a un objeto usuario los valores asociados al id recibido
 	    	return new ResponseEntity<>(ViajeServicio.eliminaViaje(v),HttpStatus.OK);	//Si existe eliminamos el usuario solicitado
 	    }else {	
 	    	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);						//Si el usuario no existe devolvemos un código de error
@@ -516,6 +515,9 @@ public class Controlador {
 					}
 					listFinal.add(new ViajePublicado(listViajes.get(i).getIdviaje(), listViajes.get(i).getLocalidadOrigen(), listViajes.get(i).getLugarSalida(), listViajes.get(i).getLocalidadDestino(),
 							listViajes.get(i).getLugarLlegada(), listViajes.get(i).getPrecio(), listViajes.get(i).getNumplazasdisponibles(), listViajes.get(i).getFechasalida(), listViajes.get(i).getFechacreacionviaje(), listUsuario));
+				}else {
+					listFinal.add(new ViajePublicado(listViajes.get(i).getIdviaje(), listViajes.get(i).getLocalidadOrigen(), listViajes.get(i).getLugarSalida(), listViajes.get(i).getLocalidadDestino(),
+							listViajes.get(i).getLugarLlegada(), listViajes.get(i).getPrecio(), listViajes.get(i).getNumplazasdisponibles(), listViajes.get(i).getFechasalida(), listViajes.get(i).getFechacreacionviaje(), new ArrayList<UsuarioPublicado>()));
 				}
 			}
 			return new ResponseEntity<List<ViajePublicado>>(listFinal, HttpStatus.OK);
