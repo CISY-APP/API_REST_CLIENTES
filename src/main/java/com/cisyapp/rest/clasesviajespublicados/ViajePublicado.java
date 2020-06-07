@@ -15,12 +15,13 @@ public class ViajePublicado implements java.io.Serializable {
 	private int numplazasdisponibles;
 	private Date fechasalida;
 	private Date fechacreacionviaje;
+	private String vehiculo;
 	//Atributos UsuarioPublicado:
 	private List<UsuarioPublicado> listUsuariosPublicados;
 	//Constructor:
 	public ViajePublicado(Integer idviaje, String localidadorigen, String lugarsalida, String localidaddestino,
 			String lugarllegada, BigDecimal precio, int numplazasdisponibles, Date fechasalida, Date fechacreacionviaje,
-			List<UsuarioPublicado> listUsuariosPublicados) {
+			List<UsuarioPublicado> listUsuariosPublicados, String vehiculo) {
 		this.idviaje = idviaje;
 		this.localidadorigen = localidadorigen;
 		this.lugarsalida = lugarsalida;
@@ -31,6 +32,7 @@ public class ViajePublicado implements java.io.Serializable {
 		this.fechasalida = fechasalida;
 		this.fechacreacionviaje = fechacreacionviaje;
 		this.listUsuariosPublicados = listUsuariosPublicados;
+		this.vehiculo= vehiculo;
 	}
 	//Metodos Getter y Setters:
 	public Integer getIdviaje() {
@@ -111,5 +113,11 @@ public class ViajePublicado implements java.io.Serializable {
 
 	public void setListUsuariosPublicados(List<UsuarioPublicado> listUsuariosPublicados) {
 		this.listUsuariosPublicados = listUsuariosPublicados;
+	}
+	public String getVehiculo() {
+		return vehiculo;
+	}
+	public void setVehiculo(String vehiculo) {
+		this.vehiculo = vehiculo;
 	}
 }

@@ -516,10 +516,12 @@ public class Controlador {
 						}
 					}
 					listFinal.add(new ViajePublicado(listViajes.get(i).getIdviaje(), listViajes.get(i).getLocalidadOrigen(), listViajes.get(i).getLugarSalida(), listViajes.get(i).getLocalidadDestino(),
-							listViajes.get(i).getLugarLlegada(), listViajes.get(i).getPrecio(), listViajes.get(i).getNumplazasdisponibles(), listViajes.get(i).getFechasalida(), listViajes.get(i).getFechacreacionviaje(), listUsuario));
+							listViajes.get(i).getLugarLlegada(), listViajes.get(i).getPrecio(), listViajes.get(i).getNumplazasdisponibles(), listViajes.get(i).getFechasalida(), listViajes.get(i).getFechacreacionviaje(),
+							listUsuario, listViajes.get(i).getVehiculo().getMarca()+" - "+listViajes.get(i).getVehiculo().getModelo()+" - "+listViajes.get(i).getVehiculo().getMatricula()));
 				}else {
 					listFinal.add(new ViajePublicado(listViajes.get(i).getIdviaje(), listViajes.get(i).getLocalidadOrigen(), listViajes.get(i).getLugarSalida(), listViajes.get(i).getLocalidadDestino(),
-							listViajes.get(i).getLugarLlegada(), listViajes.get(i).getPrecio(), listViajes.get(i).getNumplazasdisponibles(), listViajes.get(i).getFechasalida(), listViajes.get(i).getFechacreacionviaje(), new ArrayList<UsuarioPublicado>()));
+							listViajes.get(i).getLugarLlegada(), listViajes.get(i).getPrecio(), listViajes.get(i).getNumplazasdisponibles(), listViajes.get(i).getFechasalida(), listViajes.get(i).getFechacreacionviaje(),
+							new ArrayList<UsuarioPublicado>(),listViajes.get(i).getVehiculo().getMarca()+" - "+listViajes.get(i).getVehiculo().getModelo()+" - "+listViajes.get(i).getVehiculo().getMatricula()));
 				}
 			}
 			return new ResponseEntity<List<ViajePublicado>>(listFinal, HttpStatus.OK);
