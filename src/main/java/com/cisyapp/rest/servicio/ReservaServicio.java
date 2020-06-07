@@ -39,4 +39,9 @@ public class ReservaServicio {
 	public Optional <List<Reserva>> muestraReservasPorIdViaje(Integer idViaje) {
 		return ReservaRepositorio.obtenerReservasUsuarioByIdViaje(idViaje);
 	}
+	
+	// Metodo utilizado para eliminar una reserva por idUsuario e idViaje:
+	public Integer eliminarReservaIdViajeIdPasajero(Integer idViaje, Integer idPasajero) {
+		return ReservaRepositorio.eliminarReservaIdViajeIdPasajero(idViaje,idPasajero);
+	}
 }

@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -896,5 +897,33 @@ public class Controlador {
  		}else {
  			return new ResponseEntity<List<ReservaConIgnore>>(HttpStatus.NOT_FOUND);
  		}	
+	}
+ 	
+ 	//ELIMINAR RESERVA POR IDVIAJE E IDPASAJERO
+	@RequestMapping(value = "/eliminarReservaIdViajeIdPasajero/{idViaje}/{idPasajero}", method = RequestMethod.DELETE)//Asociamos la petición recibida la metodo de respuesta
+	public ResponseEntity<Reserva> eliminarReservaIdViajeIdPasajero(@PathVariable("idViaje") Integer idViaje, @PathVariable("idPasajero") Integer idPasajero) {
+		//Obtenemos el viaje e usuario por el cual borrar:
+ 		Optional<Usuario>uOpt=UsuarioServicio.consultaUsuarioPorId(idPasajero);
+ 		Optional<Viaje>vOpt=ViajeServicio.muestraViajePorId(idViaje);
+ 		//Si estan presentes seguimos, si no devolvemos error de mal solicitud:
+ 		if(vOpt.isPresent()&&vOpt.isPresent()) {
+ 			//Comprobamos que el viaje del cual se va a cancelar la reserva no este caducado, sino se devuelve error 404:
+            java.util.Date fechaViaje = vOpt.get().getFechasalida();
+            java.util.Date fechaActual = new java.util.Date(Calendar.getInstance().getTime().getTime());
+            if (fechaViaje.compareTo(fechaActual) > 0) {
+                //Borramos la reserva de ese viaje y de ese usuario:
+            	ReservaServicio.eliminarReservaIdViajeIdPasajero(idViaje, idPasajero);
+            	//Liberamos la plaza no reservada, aumentando una mas:
+            	int plazas = vOpt.get().getNumplazasdisponibles()+1;
+            	vOpt.get().setNumplazasdisponibles(plazas);
+            	ViajeServicio.actualizaViaje(vOpt.get());
+            	return new ResponseEntity<>(null,HttpStatus.OK);
+            }else {
+            	return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+            }
+ 		}else {
+ 			return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+ 		}
+ 		
 	}
 }
